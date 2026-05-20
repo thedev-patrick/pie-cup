@@ -1048,6 +1048,7 @@ export default function FixturePage() {
             </a>
           )}
         </div>
+      </div>
 
       {/* Tabs */}
       <div className="flex items-center gap-1 mb-6 bg-[#111111] border border-slate-800 rounded-xl p-1 w-fit">
