@@ -4,6 +4,20 @@ import { useState, useEffect, useCallback, Fragment } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 
+function getPositionBadgeClasses(position?: string | null) {
+  const normalized = position?.trim().toLowerCase() ?? '';
+  if (normalized.includes('def')) {
+    return 'bg-sky-500/15 border border-sky-500/30 text-sky-200';
+  }
+  if (normalized.includes('mid')) {
+    return 'bg-amber-500/15 border border-amber-500/30 text-amber-200';
+  }
+  if (normalized.includes('forw') || normalized.includes('strik') || normalized.includes('att')) {
+    return 'bg-rose-500/15 border border-rose-500/30 text-rose-200';
+  }
+  return 'bg-slate-800 border border-slate-700 text-slate-400';
+}
+
 interface Player {
   id: string;
   fullName: string;
@@ -279,14 +293,18 @@ export default function TeamDetailPage() {
             <label className="block text-xs text-slate-400 mb-1" htmlFor="addPosition">
               Position
             </label>
-            <input
+            <select
               id="addPosition"
-              type="text"
               value={addPosition}
               onChange={(e) => setAddPosition(e.target.value)}
-              placeholder="e.g. Midfielder"
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
-            />
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
+            >
+              <option value="">Select position</option>
+              <option value="Goalkeeper">Goalkeeper</option>
+              <option value="Defender">Defender</option>
+              <option value="Midfielder">Midfielder</option>
+              <option value="Forward">Forward</option>
+            </select>
           </div>
           <button
             type="submit"
@@ -345,8 +363,14 @@ export default function TeamDetailPage() {
                         </span>
                       </td>
                       <td className="px-3 py-3 text-white font-medium">{player.fullName}</td>
-                      <td className="px-3 py-3 text-slate-400 hidden sm:table-cell">
-                        {player.position ?? <span className="text-slate-600">—</span>}
+                      <td className="px-3 py-3 hidden sm:table-cell">
+                        {player.position ? (
+                          <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ${getPositionBadgeClasses(player.position)}`}>
+                            {player.position}
+                          </span>
+                        ) : (
+                          <span className="text-slate-600">—</span>
+                        )}
                       </td>
                       <td className="px-5 py-3 text-right">
                         <div className="flex justify-end gap-2">
@@ -417,15 +441,20 @@ export default function TeamDetailPage() {
                               </div>
                               <div>
                                 <label htmlFor={`editPosition-${player.id}`} className="block text-xs text-slate-400 mb-1">Position</label>
-                                <input
+                                <select
                                   id={`editPosition-${player.id}`}
-                                  type="text"
                                   value={editState.position}
                                   onChange={(e) =>
                                     setEditState((s) => s && { ...s, position: e.target.value })
                                   }
                                   className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
-                                />
+                                >
+                                  <option value="">Select position</option>
+                                  <option value="Goalkeeper">Goalkeeper</option>
+                                  <option value="Defender">Defender</option>
+                                  <option value="Midfielder">Midfielder</option>
+                                  <option value="Forward">Forward</option>
+                                </select>
                               </div>
                               <button
                                 type="submit"
@@ -476,7 +505,9 @@ export default function TeamDetailPage() {
                     </div>
                     <div className="text-right">
                       <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Position</p>
-                      <p className="mt-2 text-sm font-medium text-white">{player.position ?? '—'}</p>
+                      <p className={`mt-2 inline-flex rounded-full px-2 py-1 text-xs font-semibold ${getPositionBadgeClasses(player.position)}`}>
+                        {player.position ?? '—'}
+                      </p>
                     </div>
                   </div>
                   <h3 className="mt-4 text-lg font-semibold text-white">{player.fullName}</h3>
@@ -539,15 +570,20 @@ export default function TeamDetailPage() {
                           </div>
                           <div>
                             <label htmlFor={`gridEditPosition-${player.id}`} className="block text-xs text-slate-400 mb-1">Position</label>
-                            <input
+                            <select
                               id={`gridEditPosition-${player.id}`}
-                              type="text"
                               value={editState.position}
                               onChange={(e) =>
                                 setEditState((s) => s && { ...s, position: e.target.value })
                               }
                               className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
-                            />
+                            >
+                              <option value="">Select position</option>
+                              <option value="Goalkeeper">Goalkeeper</option>
+                              <option value="Defender">Defender</option>
+                              <option value="Midfielder">Midfielder</option>
+                              <option value="Forward">Forward</option>
+                            </select>
                           </div>
                           <div className="flex flex-wrap gap-2 justify-end">
                             <button

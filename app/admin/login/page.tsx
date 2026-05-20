@@ -32,7 +32,7 @@ export default function AdminLoginPage() {
         return;
       }
 
-      router.push('/admin');
+      router.replace('/admin');
     } catch (err) {
       setError('Unable to sign in');
     } finally {

@@ -1026,9 +1026,9 @@ export default function FixturePage() {
           </div>
         </div>
 
-        {/* Score pill */}
-        {(fixture.scoreAt90Home != null || fixture.scoreAt90Away != null) && (
-          <div className="bg-[#111111] border border-slate-800 rounded-xl px-5 py-3 text-center">
+        <div className="flex flex-col gap-3 sm:items-end">
+          {(fixture.scoreAt90Home != null || fixture.scoreAt90Away != null) && (
+            <div className="bg-[#111111] border border-slate-800 rounded-xl px-5 py-3 text-center">
             <p className="text-2xl font-bold text-white tabular-nums">
               {fixture.scoreAt90Home ?? 0} – {fixture.scoreAt90Away ?? 0}
             </p>
@@ -1036,8 +1036,18 @@ export default function FixturePage() {
               HT {fixture.scoreAtHalfTimeHome ?? 0} – {fixture.scoreAtHalfTimeAway ?? 0}
             </p>
           </div>
-        )}
-      </div>
+          )}
+          {fixture.status === 'complete' && (
+            <a
+              href={`/api/fixtures/${fixture.id}/report`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center justify-center rounded-lg bg-[#00E676] px-4 py-2 text-xs font-semibold text-black hover:bg-[#8cff91] transition-colors"
+            >
+              Download Report
+            </a>
+          )}
+        </div>
 
       {/* Tabs */}
       <div className="flex items-center gap-1 mb-6 bg-[#111111] border border-slate-800 rounded-xl p-1 w-fit">

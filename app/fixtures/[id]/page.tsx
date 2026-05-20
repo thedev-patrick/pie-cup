@@ -30,6 +30,20 @@ function eventIcon(type: string) {
   }
 }
 
+function getPositionBadgeClasses(position?: string | null) {
+  const normalized = position?.trim().toLowerCase() ?? '';
+  if (normalized.includes('def')) {
+    return 'bg-sky-500/15 border border-sky-500/30 text-sky-200';
+  }
+  if (normalized.includes('mid')) {
+    return 'bg-amber-500/15 border border-amber-500/30 text-amber-200';
+  }
+  if (normalized.includes('forw') || normalized.includes('strik') || normalized.includes('att')) {
+    return 'bg-rose-500/15 border border-rose-500/30 text-rose-200';
+  }
+  return 'bg-slate-800 border border-slate-700 text-slate-400';
+}
+
 function getInitials(name: string): string {
   return name
     .split(/\s+/)
@@ -266,7 +280,7 @@ export default async function FixturePage({
                           </span>
                           <span className="text-white font-medium">{l.player.fullName}</span>
                           {(l.position ?? l.player.position) && (
-                            <span className="ea-label">
+                            <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${getPositionBadgeClasses(l.position ?? l.player.position)}`}>
                               {l.position ?? l.player.position}
                             </span>
                           )}
@@ -286,7 +300,7 @@ export default async function FixturePage({
                           </span>
                           <span className="text-[#3d6b3d]">{l.player.fullName}</span>
                           {(l.position ?? l.player.position) && (
-                            <span className="ea-label">
+                            <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${getPositionBadgeClasses(l.position ?? l.player.position)}`}>
                               {l.position ?? l.player.position}
                             </span>
                           )}
@@ -313,7 +327,7 @@ export default async function FixturePage({
                           </span>
                           <span className="text-white font-medium">{l.player.fullName}</span>
                           {(l.position ?? l.player.position) && (
-                            <span className="ea-label">
+                            <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${getPositionBadgeClasses(l.position ?? l.player.position)}`}>
                               {l.position ?? l.player.position}
                             </span>
                           )}
@@ -333,7 +347,7 @@ export default async function FixturePage({
                           </span>
                           <span className="text-[#3d6b3d]">{l.player.fullName}</span>
                           {(l.position ?? l.player.position) && (
-                            <span className="ea-label">
+                            <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${getPositionBadgeClasses(l.position ?? l.player.position)}`}>
                               {l.position ?? l.player.position}
                             </span>
                           )}

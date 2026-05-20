@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { cleanupOldReports, generateMatchReportPdf } from '@/lib/matchReport';
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   const fixture = await prisma.fixture.findUnique({
@@ -54,6 +55,11 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         lineups: { include: { player: { include: { team: true } } } },
       },
     });
+
+    if (updated.status === 'complete') {
+      await cleanupOldReports();
+      await generateMatchReportPdf(updated as any);
+    }
 
     return NextResponse.json(updated);
   } catch (error) {
