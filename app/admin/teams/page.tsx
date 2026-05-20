@@ -206,12 +206,13 @@ export default function TeamsPage() {
               <div className="flex gap-2 pt-1 border-t border-slate-800">
                 <Link
                   href={`/admin/teams/${team.id}`}
-                  className="flex-1 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white px-3 py-1.5 rounded-lg transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white px-3 py-1.5 rounded-lg transition-colors"
                   title="Manage players"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
                     <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
                   </svg>
+                  <span className="text-sm font-medium">Manage players</span>
                 </Link>
                 <button
                   onClick={() => handleDelete(team.id)}
