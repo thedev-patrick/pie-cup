@@ -1,0 +1,107 @@
+body {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #000000;
+  color: #d8ffcf;
+}
+
+header, footer {
+  text-align: center;
+  padding: 24px 16px;
+  background: #041204;
+  color: #90ff99;
+}
+
+header h1,
+footer p {
+  margin: 0;
+}
+
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+
+.card, .fixture-card, .progression-card {
+  background: #081107;
+  border: 1px solid #13311d;
+  border-radius: 16px;
+  box-shadow: 0 12px 28px rgba(0, 230, 118, 0.14);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.stat-card ul {
+  padding-left: 16px;
+  margin: 0;
+}
+
+form {
+  display: grid;
+  gap: 16px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  font-weight: 600;
+  color: #a8ffb7;
+}
+
+input, textarea, select {
+  border: 1px solid #14321f;
+  border-radius: 12px;
+  padding: 12px 14px;
+  width: 100%;
+  font: inherit;
+  background: #071107;
+  color: #e6ffdb;
+}
+
+button {
+  background: #00e676;
+  color: #000000;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+button.secondary {
+  background: #0b2f15;
+  color: #a8ffb7;
+}
+
+button:hover {
+  opacity: 0.95;
+}
+
+footer {
+  font-size: 0.95rem;
+}
+
+a {
+  color: #00e676;
+  text-decoration: none;
+}

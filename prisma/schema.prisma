@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Team {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  shortName String?
+  players   Player[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Player {
+  id           String        @id @default(uuid())
+  fullName     String
+  jerseyNumber Int
+  position     String?
+  team         Team          @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId       String
+  lineups      MatchLineup[]
+  events       MatchEvent[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@unique([teamId, jerseyNumber])
+}
+
+model Tournament {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  season    String?
+  fixtures  Fixture[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Fixture {
+  id                      String       @id @default(uuid())
+  homeTeam                String
+  awayTeam                String
+  date                    DateTime
+  kickOffTime             String
+  venue                   String
+  matchday                String?
+  status                  String       @default("scheduled")
+  scoreAtHalfTimeHome     Int?
+  scoreAtHalfTimeAway     Int?
+  scoreAt90Home           Int?
+  scoreAt90Away           Int?
+  extraTimePlayed         Boolean      @default(false)
+  scoreAfterExtraTimeHome Int?
+  scoreAfterExtraTimeAway Int?
+  manOfTheMatch           String?
+  tournamentStage         String?
+  tournament              Tournament?  @relation(fields: [tournamentId], references: [id])
+  tournamentId            String?
+  createdAt               DateTime     @default(now())
+  updatedAt               DateTime     @updatedAt
+  stats                   PlayerStat[]
+  lineups                 MatchLineup[]
+  events                  MatchEvent[]
+}
+
+model MatchLineup {
+  id        String   @id @default(uuid())
+  fixture   Fixture  @relation(fields: [fixtureId], references: [id], onDelete: Cascade)
+  fixtureId String
+  player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  playerId  String
+  side      String   // "home" or "away"
+  role      String   // "starter" or "substitute"
+  position  String?
+  createdAt DateTime @default(now())
+
+  @@unique([fixtureId, playerId])
+}
+
+model MatchEvent {
+  id             String   @id @default(uuid())
+  fixture        Fixture  @relation(fields: [fixtureId], references: [id], onDelete: Cascade)
+  fixtureId      String
+  minute         Int
+  type           String   // "goal", "yellow_card", "red_card", "substitution", "own_goal", "penalty"
+  side           String   // "home" or "away"
+  player         Player?  @relation(fields: [playerId], references: [id])
+  playerId       String?
+  playerName     String?
+  assistName     String?
+  playerOutName  String?  // for substitutions
+  description    String?
+  createdAt      DateTime @default(now())
+}
+
+model PlayerStat {
+  id        String  @id @default(uuid())
+  fixture   Fixture @relation(fields: [fixtureId], references: [id], onDelete: Cascade)
+  fixtureId String
+  name      String
+  team      String
+  goals     Int     @default(0)
+  assists   Int     @default(0)
+  yellowCards Int   @default(0)
+  redCards  Int     @default(0)
+}

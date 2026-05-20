@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(curl -s http://localhost:3000/admin)",
+      "Bash(curl -s http://localhost:3000/admin -L)",
+      "Read(//private/tmp/**)",
+      "Bash(curl -s http://localhost:3001/admin)",
+      "Bash(curl -s http://localhost:3001/)",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(curl -s http://localhost:3000/admin/fixtures/new)",
+      "Bash(curl -s http://localhost:3000/api/fixtures)",
+      "Bash(curl -s \"http://localhost:3000/admin/fixtures/$\\(curl -s http://localhost:3000/api/fixtures)",
+      "Bash(npx tsc:*)",
+      "Bash(npx prisma:*)",
+      "Bash(curl -s http://localhost:3000/admin/tournaments)",
+      "Bash(node -e ':*)"
+    ],
+    "additionalDirectories": [
+      "/Users/patrick/Desktop/pie-cup/app/admin/teams",
+      "/Users/patrick/Desktop/pie-cup/app/api/tournaments"
+    ]
+  }
+}

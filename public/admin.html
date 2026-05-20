@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PIE CUP Admin Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>PIE CUP Admin Dashboard</h1>
+    <p>Create fixtures, update match details, and record stats for each match.</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Create / Update Fixture</h2>
+      <form id="fixture-form">
+        <input type="hidden" id="fixture-id" />
+        <div class="form-grid">
+          <label>Home Team<input type="text" id="homeTeam" required /></label>
+          <label>Away Team<input type="text" id="awayTeam" required /></label>
+          <label>Date<input type="date" id="date" required /></label>
+          <label>Kick Off Time<input type="time" id="kickOffTime" required /></label>
+          <label>Venue<input type="text" id="venue" required /></label>
+          <label>Matchday<input type="text" id="matchday" /></label>
+          <label>Score Half Time<input type="text" id="scoreAtHalfTime" placeholder="1-0" /></label>
+          <label>Score 90 Minutes<input type="text" id="scoreAt90Minutes" placeholder="2-1" /></label>
+          <label>Extra Time Played<select id="extraTimePlayed"><option>NO</option><option>YES</option></select></label>
+          <label>Score After Extra Time<input type="text" id="scoreAfterExtraTime" placeholder="2-2" /></label>
+          <label>Man of the Match<input type="text" id="manOfTheMatch" /></label>
+        </div>
+
+        <label>Home Team Details<textarea id="homeTeamDetails" rows="3"></textarea></label>
+        <label>Away Team Details<textarea id="awayTeamDetails" rows="3"></textarea></label>
+        <label>Home Team Nominated Substitutes<textarea id="homeTeamSubstitutes" rows="2" placeholder="Comma separated"></textarea></label>
+        <label>Away Team Nominated Substitutes<textarea id="awayTeamSubstitutes" rows="2" placeholder="Comma separated"></textarea></label>
+        <label>Discipline Notes<textarea id="disciplineNotes" rows="2"></textarea></label>
+        <label>Technical Committee Members<textarea id="technicalCommittee" rows="2" placeholder="One name per line"></textarea></label>
+        <label>Upcoming Fixtures<textarea id="upcomingFixtures" rows="2" placeholder="One fixture per line"></textarea></label>
+        <label>Observations<textarea id="observations" rows="2"></textarea></label>
+        <label>Tournament Stage<input type="text" id="tournamentStage" /></label>
+        <label>Progression Notes<textarea id="progressionNotes" rows="2"></textarea></label>
+
+        <div class="form-actions">
+          <button type="submit">Save Fixture</button>
+          <button type="button" id="reset-button" class="secondary">Reset Form</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Match Fixtures</h2>
+      <div id="fixture-list"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Open public site at <a href="index.html">Results & Fixtures</a></p>
+  </footer>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>

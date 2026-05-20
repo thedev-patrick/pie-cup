@@ -1,0 +1,38 @@
+[
+  {
+    "id": "fixture-1",
+    "date": "2026-06-01",
+    "kickOffTime": "14:00",
+    "venue": "Community Stadium",
+    "matchday": "1",
+    "homeTeam": "Blue Falcons",
+    "awayTeam": "Red Tigers",
+    "status": "complete",
+    "scoreAtHalfTime": { "home": 1, "away": 0 },
+    "scoreAt90Minutes": { "home": 2, "away": 1 },
+    "extraTimePlayed": "NO",
+    "scoreAfterExtraTime": null,
+    "homeTeamDetails": "11 players listed by the technical team",
+    "awayTeamDetails": "11 players listed by the technical team",
+    "homeTeamSubstitutes": ["Sub 1", "Sub 2", "Sub 3"],
+    "awayTeamSubstitutes": ["Sub 1", "Sub 2", "Sub 3"],
+    "discipline": {
+      "home": { "yellowCards": 2, "redCards": 0 },
+      "away": { "yellowCards": 3, "redCards": 0 },
+      "notes": "One late tackle and one offside goal disallowed."
+    },
+    "manOfTheMatch": "Jack Henderson",
+    "technicalCommittee": ["Alex Nguyen", "Priya Sharma", "Omar Babatunde"],
+    "upcomingFixtures": ["Yellow Eagles vs Blue Falcons", "Red Tigers vs White Wolves"],
+    "observations": "Strong home performance and compact defensive block.",
+    "stats": {
+      "players": [
+        { "name": "Jack Henderson", "team": "Blue Falcons", "goals": 1, "assists": 1, "yellowCards": 0, "redCards": 0 },
+        { "name": "Mason Lee", "team": "Blue Falcons", "goals": 1, "assists": 0, "yellowCards": 1, "redCards": 0 },
+        { "name": "Jordan Smith", "team": "Red Tigers", "goals": 1, "assists": 0, "yellowCards": 2, "redCards": 0 }
+      ]
+    },
+    "tournamentStage": "Group A",
+    "progressionNotes": "Blue Falcons move to the next round with a strong start."
+  }
+]
