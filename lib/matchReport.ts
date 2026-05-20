@@ -5,6 +5,43 @@ import PDFDocument from 'pdfkit';
 
 const REPORT_DIR = path.join(process.cwd(), 'reports', 'fixtures');
 const REPORT_TTL_MS = 24 * 60 * 60 * 1000;
+const PDFKIT_DATA_SOURCE = path.join(process.cwd(), 'node_modules', 'pdfkit', 'js', 'data');
+const PDFKIT_DATA_TARGET = path.join(process.cwd(), '.next', 'server', 'vendor-chunks', 'data');
+const PDFKIT_STANDARD_FONT_FILES = [
+  'Courier.afm',
+  'Courier-Bold.afm',
+  'Courier-Oblique.afm',
+  'Courier-BoldOblique.afm',
+  'Helvetica.afm',
+  'Helvetica-Bold.afm',
+  'Helvetica-Oblique.afm',
+  'Helvetica-BoldOblique.afm',
+  'Times-Roman.afm',
+  'Times-Bold.afm',
+  'Times-Italic.afm',
+  'Times-BoldItalic.afm',
+  'Symbol.afm',
+  'ZapfDingbats.afm',
+];
+
+async function ensurePdfKitFontAssets() {
+  if (!fs.existsSync(PDFKIT_DATA_SOURCE)) {
+    return;
+  }
+
+  await fsPromises.mkdir(PDFKIT_DATA_TARGET, { recursive: true });
+
+  await Promise.all(
+    PDFKIT_STANDARD_FONT_FILES.map(async (fontFile) => {
+      const sourcePath = path.join(PDFKIT_DATA_SOURCE, fontFile);
+      const targetPath = path.join(PDFKIT_DATA_TARGET, fontFile);
+
+      if (!fs.existsSync(targetPath)) {
+        await fsPromises.copyFile(sourcePath, targetPath);
+      }
+    }),
+  );
+}
 
 interface MatchLineup {
   id: string;
@@ -126,6 +163,7 @@ function getEventLabel(event: MatchEvent) {
 
 export async function generateMatchReportPdf(fixture: FixtureReport) {
   await ensureReportDirectory();
+  await ensurePdfKitFontAssets();
   const reportPath = getFixtureReportFilePath(fixture.id);
 
   const doc = new PDFDocument({ size: 'A4', margin: 48, autoFirstPage: true });
