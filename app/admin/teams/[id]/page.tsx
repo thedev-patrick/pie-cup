@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Fragment } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -47,6 +47,7 @@ export default function TeamDetailPage() {
 
   // Delete state
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
 
   const fetchTeam = useCallback(async () => {
     try {
@@ -212,7 +213,7 @@ export default function TeamDetailPage() {
       </Link>
 
       {/* Team heading */}
-      <div className="mb-8 flex items-center gap-3">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">{team.name}</h1>
           <p className="text-slate-400 text-sm mt-0.5">
@@ -223,6 +224,22 @@ export default function TeamDetailPage() {
             )}
             {team.players.length} {team.players.length === 1 ? 'player' : 'players'}
           </p>
+        </div>
+        <div className="inline-flex items-center gap-2 rounded-full bg-slate-950 border border-slate-800 p-1">
+          <button
+            type="button"
+            onClick={() => setViewMode('list')}
+            className={`rounded-full px-3 py-2 text-xs font-semibold transition ${viewMode === 'list' ? 'bg-[#00E676] text-black' : 'text-slate-300 hover:text-white'}`}
+          >
+            List
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('grid')}
+            className={`rounded-full px-3 py-2 text-xs font-semibold transition ${viewMode === 'grid' ? 'bg-[#00E676] text-black' : 'text-slate-300 hover:text-white'}`}
+          >
+            Grid
+          </button>
         </div>
       </div>
 
@@ -298,153 +315,267 @@ export default function TeamDetailPage() {
         </div>
       ) : (
         <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-slate-800">
-                <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wide px-5 py-3 w-16">
-                  #
-                </th>
-                <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wide px-3 py-3">
-                  Name
-                </th>
-                <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wide px-3 py-3 hidden sm:table-cell">
-                  Position
-                </th>
-                <th className="text-right text-xs font-medium text-slate-400 uppercase tracking-wide px-5 py-3">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800">
-              {team.players.map((player) => (
-                <>
-                  {/* Main row */}
-                  <tr
-                    key={player.id}
-                    className={`group transition-colors ${editState?.playerId === player.id ? 'bg-slate-800/50' : 'hover:bg-slate-800/30'}`}
-                  >
-                    <td className="px-5 py-3">
-                      <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-700 text-white font-mono font-semibold text-xs">
-                        {player.jerseyNumber}
-                      </span>
-                    </td>
-                    <td className="px-3 py-3 text-white font-medium">{player.fullName}</td>
-                    <td className="px-3 py-3 text-slate-400 hidden sm:table-cell">
-                      {player.position ?? <span className="text-slate-600">—</span>}
-                    </td>
-                    <td className="px-5 py-3 text-right">
-                      <div className="flex justify-end gap-2">
-                        {editState?.playerId === player.id ? (
-                          <button
-                            onClick={cancelEdit}
-                            className="text-xs text-slate-400 hover:text-white px-2 py-1 rounded transition-colors"
-                          >
-                            Cancel
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => openEdit(player)}
-                            className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg transition-colors"
-                            title="Edit player"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                              <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
-                            </svg>
-                          </button>
-                        )}
-                        <button
-                          onClick={() => handleDeletePlayer(player.id)}
-                          disabled={deletingId === player.id}
-                          className="text-xs bg-red-950 hover:bg-red-900 disabled:opacity-50 disabled:cursor-not-allowed text-red-400 hover:text-red-300 px-3 py-1.5 rounded-lg transition-colors"
-                          title="Delete player"
-                        >
-                          {deletingId === player.id ? '...' : (
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                              <path fillRule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clipRule="evenodd" />
-                            </svg>
+          {viewMode === 'list' ? (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-800">
+                  <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wide px-5 py-3 w-16">
+                    #
+                  </th>
+                  <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wide px-3 py-3">
+                    Name
+                  </th>
+                  <th className="text-left text-xs font-medium text-slate-400 uppercase tracking-wide px-3 py-3 hidden sm:table-cell">
+                    Position
+                  </th>
+                  <th className="text-right text-xs font-medium text-slate-400 uppercase tracking-wide px-5 py-3">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800">
+                {team.players.map((player) => (
+                  <Fragment key={player.id}>
+                    <tr
+                      className={`group transition-colors ${editState?.playerId === player.id ? 'bg-slate-800/50' : 'hover:bg-slate-800/30'}`}
+                    >
+                      <td className="px-5 py-3">
+                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-700 text-white font-mono font-semibold text-xs">
+                          {player.jerseyNumber}
+                        </span>
+                      </td>
+                      <td className="px-3 py-3 text-white font-medium">{player.fullName}</td>
+                      <td className="px-3 py-3 text-slate-400 hidden sm:table-cell">
+                        {player.position ?? <span className="text-slate-600">—</span>}
+                      </td>
+                      <td className="px-5 py-3 text-right">
+                        <div className="flex justify-end gap-2">
+                          {editState?.playerId === player.id ? (
+                            <button
+                              onClick={cancelEdit}
+                              className="text-xs text-slate-400 hover:text-white px-2 py-1 rounded transition-colors"
+                            >
+                              Cancel
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => openEdit(player)}
+                              className="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg transition-colors"
+                              title="Edit player"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                                <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
+                              </svg>
+                            </button>
                           )}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+                          <button
+                            onClick={() => handleDeletePlayer(player.id)}
+                            disabled={deletingId === player.id}
+                            className="text-xs bg-red-950 hover:bg-red-900 disabled:opacity-50 disabled:cursor-not-allowed text-red-400 hover:text-red-300 px-3 py-1.5 rounded-lg transition-colors"
+                            title="Delete player"
+                          >
+                            {deletingId === player.id ? '...' : (
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                                <path fillRule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clipRule="evenodd" />
+                              </svg>
+                            )}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
 
-                  {/* Inline edit row */}
+                    {editState?.playerId === player.id && (
+                      <tr key={`${player.id}-edit`} className="bg-slate-800/60">
+                        <td colSpan={4} className="px-5 py-4">
+                          <form onSubmit={handleSaveEdit}>
+                            <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr_auto_auto] gap-3 items-end">
+                              <div>
+                                <label htmlFor={`editFullName-${player.id}`} className="block text-xs text-slate-400 mb-1">Full Name</label>
+                                <input
+                                  id={`editFullName-${player.id}`}
+                                  type="text"
+                                  value={editState.fullName}
+                                  onChange={(e) =>
+                                    setEditState((s) => s && { ...s, fullName: e.target.value })
+                                  }
+                                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
+                                />
+                              </div>
+                              <div className="w-full sm:w-24">
+                                <label htmlFor={`editJersey-${player.id}`} className="block text-xs text-slate-400 mb-1">Jersey #</label>
+                                <input
+                                  id={`editJersey-${player.id}`}
+                                  type="number"
+                                  min={1}
+                                  max={99}
+                                  value={editState.jerseyNumber}
+                                  onChange={(e) =>
+                                    setEditState((s) => s && { ...s, jerseyNumber: e.target.value })
+                                  }
+                                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
+                                />
+                              </div>
+                              <div>
+                                <label htmlFor={`editPosition-${player.id}`} className="block text-xs text-slate-400 mb-1">Position</label>
+                                <input
+                                  id={`editPosition-${player.id}`}
+                                  type="text"
+                                  value={editState.position}
+                                  onChange={(e) =>
+                                    setEditState((s) => s && { ...s, position: e.target.value })
+                                  }
+                                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
+                                />
+                              </div>
+                              <button
+                                type="submit"
+                                disabled={saving}
+                                className="shrink-0 bg-green-700 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                              >
+                                {saving ? 'Saving...' : (
+                                  <span className="flex items-center gap-1.5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                                      <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
+                                    </svg>
+                                    Save
+                                  </span>
+                                )}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={cancelEdit}
+                                className="shrink-0 bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                                title="Cancel"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                                  <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                                </svg>
+                              </button>
+                            </div>
+                            {editError && (
+                              <p className="mt-2 text-sm text-red-400">{editError}</p>
+                            )}
+                          </form>
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="grid gap-4 p-4 sm:grid-cols-2">
+              {team.players.map((player) => (
+                <div key={player.id} className="rounded-2xl border border-slate-800 bg-slate-950 p-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Jersey</p>
+                      <p className="mt-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-700 text-sm font-semibold text-white">
+                        {player.jerseyNumber}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Position</p>
+                      <p className="mt-2 text-sm font-medium text-white">{player.position ?? '—'}</p>
+                    </div>
+                  </div>
+                  <h3 className="mt-4 text-lg font-semibold text-white">{player.fullName}</h3>
+                  <div className="mt-4 flex flex-wrap gap-2 justify-end">
+                    {editState?.playerId === player.id ? (
+                      <button
+                        type="button"
+                        onClick={cancelEdit}
+                        className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => openEdit(player)}
+                        className="rounded-lg bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
+                      >
+                        Edit
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => handleDeletePlayer(player.id)}
+                      disabled={deletingId === player.id}
+                      className="rounded-lg bg-red-950 px-3 py-2 text-xs font-semibold text-red-400 hover:bg-red-900 hover:text-red-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      {deletingId === player.id ? '...' : 'Delete'}
+                    </button>
+                  </div>
                   {editState?.playerId === player.id && (
-                    <tr key={`${player.id}-edit`} className="bg-slate-800/60">
-                      <td colSpan={4} className="px-5 py-4">
-                        <form onSubmit={handleSaveEdit}>
-                          <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr_auto_auto] gap-3 items-end">
-                            <div>
-                              <label className="block text-xs text-slate-400 mb-1">Full Name</label>
-                              <input
-                                type="text"
-                                value={editState.fullName}
-                                onChange={(e) =>
-                                  setEditState((s) => s && { ...s, fullName: e.target.value })
-                                }
-                                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
-                              />
-                            </div>
-                            <div className="w-full sm:w-24">
-                              <label className="block text-xs text-slate-400 mb-1">Jersey #</label>
-                              <input
-                                type="number"
-                                min={1}
-                                max={99}
-                                value={editState.jerseyNumber}
-                                onChange={(e) =>
-                                  setEditState((s) => s && { ...s, jerseyNumber: e.target.value })
-                                }
-                                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-xs text-slate-400 mb-1">Position</label>
-                              <input
-                                type="text"
-                                value={editState.position}
-                                onChange={(e) =>
-                                  setEditState((s) => s && { ...s, position: e.target.value })
-                                }
-                                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
-                              />
-                            </div>
+                    <div className="mt-4 rounded-2xl border border-slate-800 bg-slate-900 p-4">
+                      <form onSubmit={handleSaveEdit}>
+                        <div className="grid gap-3">
+                          <div>
+                            <label htmlFor={`gridEditFullName-${player.id}`} className="block text-xs text-slate-400 mb-1">Full Name</label>
+                            <input
+                              id={`gridEditFullName-${player.id}`}
+                              type="text"
+                              value={editState.fullName}
+                              onChange={(e) =>
+                                setEditState((s) => s && { ...s, fullName: e.target.value })
+                              }
+                              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor={`gridEditJersey-${player.id}`} className="block text-xs text-slate-400 mb-1">Jersey #</label>
+                            <input
+                              id={`gridEditJersey-${player.id}`}
+                              type="number"
+                              min={1}
+                              max={99}
+                              value={editState.jerseyNumber}
+                              onChange={(e) =>
+                                setEditState((s) => s && { ...s, jerseyNumber: e.target.value })
+                              }
+                              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor={`gridEditPosition-${player.id}`} className="block text-xs text-slate-400 mb-1">Position</label>
+                            <input
+                              id={`gridEditPosition-${player.id}`}
+                              type="text"
+                              value={editState.position}
+                              onChange={(e) =>
+                                setEditState((s) => s && { ...s, position: e.target.value })
+                              }
+                              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent"
+                            />
+                          </div>
+                          <div className="flex flex-wrap gap-2 justify-end">
                             <button
                               type="submit"
                               disabled={saving}
-                              className="shrink-0 bg-green-700 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                              className="rounded-lg bg-green-700 px-4 py-2 text-xs font-medium text-white hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
-                              {saving ? 'Saving...' : (
-                                <span className="flex items-center gap-1.5">
-                                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                                    <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
-                                  </svg>
-                                  Save
-                                </span>
-                              )}
+                              {saving ? 'Saving...' : 'Save'}
                             </button>
                             <button
                               type="button"
                               onClick={cancelEdit}
-                              className="shrink-0 bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
-                              title="Cancel"
+                              className="rounded-lg bg-slate-700 px-4 py-2 text-xs font-medium text-slate-300 hover:bg-slate-600 hover:text-white transition-colors"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                                <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
-                              </svg>
+                              Cancel
                             </button>
                           </div>
                           {editError && (
                             <p className="mt-2 text-sm text-red-400">{editError}</p>
                           )}
-                        </form>
-                      </td>
-                    </tr>
+                        </div>
+                      </form>
+                    </div>
                   )}
-                </>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html {
+  font-size: 120%;
+}
+
 /* ── Font utility classes ── */
 .font-condensed {
   font-family: var(--font-condensed), ui-sans-serif, system-ui, sans-serif;

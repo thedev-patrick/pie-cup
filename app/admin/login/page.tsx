@@ -109,11 +109,6 @@ export default function AdminLoginPage() {
             {submitting ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
-
-        <div className="mt-6 rounded-xl bg-[#0b0b0b] border border-[#222222] px-4 py-4 text-sm text-slate-500">
-          <p><span className="font-semibold text-white">Example email:</span> john.doe@example.com</p>
-          <p><span className="font-semibold text-white">Password:</span> PieCupLagos100!</p>
-        </div>
       </div>
     </div>
   );
