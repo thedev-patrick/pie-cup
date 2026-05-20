@@ -1,13 +1,10 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { FormEvent, useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 
-const ADMIN_EMAIL = 'admin@piecup.cci';
-const ADMIN_PASSWORD = 'PieCupLagos100!';
-
-export default function AdminLoginPage() {
-  const router = useRouter();
+function LoginForm() {
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -32,7 +29,8 @@ export default function AdminLoginPage() {
         return;
       }
 
-      router.replace('/admin');
+      const from = searchParams.get('from');
+      window.location.href = from && from.startsWith('/admin') ? from : '/admin';
     } catch (err) {
       setError('Unable to sign in');
     } finally {
@@ -111,5 +109,13 @@ export default function AdminLoginPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }

@@ -10,11 +10,18 @@ export function middleware(request: NextRequest) {
     return;
   }
 
+  const authCookie = request.cookies.get('admin-auth')?.value;
+
   if (pathname === LOGIN_PATH) {
+    if (authCookie === 'true') {
+      const dashboardUrl = request.nextUrl.clone();
+      dashboardUrl.pathname = ADMIN_PATH;
+      dashboardUrl.search = '';
+      return NextResponse.redirect(dashboardUrl);
+    }
     return;
   }
 
-  const authCookie = request.cookies.get('admin-auth')?.value;
   if (authCookie !== 'true') {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = LOGIN_PATH;

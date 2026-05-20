@@ -14,7 +14,8 @@
       "Bash(npx tsc:*)",
       "Bash(npx prisma:*)",
       "Bash(curl -s http://localhost:3000/admin/tournaments)",
-      "Bash(node -e ':*)"
+      "Bash(node -e ':*)",
+      "Bash(head -80 /Users/patrick/Desktop/pie-cup/app/admin/teams/[id]/page.tsx)"
     ],
     "additionalDirectories": [
       "/Users/patrick/Desktop/pie-cup/app/admin/teams",
