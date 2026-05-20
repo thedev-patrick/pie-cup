@@ -90,6 +90,7 @@ const EV_ICON: Record<string, string> = {
   free_kick: '🎯',
   corner: '↪️',
   goal_kick: '🥅',
+  offside: '🚫',
 };
 
 // ─── Helper components ────────────────────────────────────────────────────────
@@ -115,7 +116,7 @@ function LiveCard({ fixture }: { fixture: Fixture }) {
     : null;
   const keyEvents = [...fixture.events]
     .filter((e) =>
-      ['goal', 'penalty', 'own_goal', 'yellow_card', 'red_card', 'foul', 'free_kick', 'corner', 'goal_kick'].includes(e.type),
+      ['goal', 'penalty', 'own_goal', 'yellow_card', 'red_card', 'foul', 'free_kick', 'corner', 'goal_kick', 'offside'].includes(e.type),
     )
     .sort((a, b) => b.minute - a.minute)
     .slice(0, 4);

@@ -90,6 +90,7 @@ const EVENT_ICONS: Record<string, string> = {
   free_kick: '🎯',
   corner: '↪️',
   goal_kick: '🥅',
+  offside: '🚫',
 };
 
 function inputCls(extra = '') {
@@ -774,6 +775,7 @@ function EventsTab({ fixture, onRefresh }: { fixture: Fixture; onRefresh: () => 
               <option value="free_kick">Free Kick</option>
               <option value="corner">Corner</option>
               <option value="goal_kick">Goal Kick</option>
+              <option value="offside">Offside</option>
               <option value="substitution">Substitution</option>
               <option value="own_goal">Own Goal</option>
               <option value="penalty">Penalty</option>

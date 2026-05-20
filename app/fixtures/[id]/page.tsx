@@ -25,6 +25,7 @@ function eventIcon(type: string) {
     case 'free_kick': return '🎯';
     case 'corner': return '↪️';
     case 'goal_kick': return '🥅';
+    case 'offside': return '🚫';
     default: return '•';
   }
 }
