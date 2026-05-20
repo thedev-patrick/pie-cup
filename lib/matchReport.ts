@@ -202,8 +202,9 @@ export async function generateMatchReportPdf(fixture: FixtureReport) {
   });
 
   if (fixture.stats && fixture.stats.length > 0) {
+    const stats = fixture.stats;
     makeSection('Statistics', () => {
-      fixture.stats.forEach((stat) => {
+      stats.forEach((stat) => {
         doc.text(`• ${stat.team} – ${stat.name}: ${stat.goals} goals, ${stat.assists} assists, ${stat.yellowCards} yellow cards, ${stat.redCards} red cards`);
       });
     });
