@@ -16,6 +16,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
 
+  if (pathname === '/admin/login') {
+    return <>{children}</>;
+  }
+
   return (
     <div className="flex min-h-screen bg-[#000000]">
 
@@ -43,12 +47,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           ))}
         </nav>
         <div className="mt-auto pt-6">
-          <Link
-            href="/admin/logout"
-            className="font-condensed font-bold text-sm uppercase tracking-wider block px-3 py-2.5 text-[#ff7a7a] hover:text-white hover:bg-[#1a1a1a] border-l-2 border-transparent rounded-r-lg transition-colors"
-          >
-            Logout
-          </Link>
+          <form action="/admin/logout" method="POST">
+            <button
+              type="submit"
+              className="font-condensed font-bold text-sm uppercase tracking-wider w-full text-left px-3 py-2.5 text-[#ff7a7a] hover:text-white hover:bg-[#1a1a1a] border-l-2 border-transparent rounded-r-lg transition-colors"
+            >
+              Logout
+            </button>
+          </form>
         </div>
       </aside>
 
