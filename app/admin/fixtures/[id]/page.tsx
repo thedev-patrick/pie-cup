@@ -91,6 +91,7 @@ const EVENT_ICONS: Record<string, string> = {
   corner: '↪️',
   goal_kick: '🥅',
   offside: '🚫',
+  half_time: '⏸️',
 };
 
 function inputCls(extra = '') {
@@ -703,220 +704,264 @@ function EventsTab({ fixture, onRefresh }: { fixture: Fixture; onRefresh: () => 
           <p className="text-slate-600 text-sm text-center py-4">No events yet.</p>
         ) : (
           <div className="space-y-1">
-            {sortedEvents.map((ev) => (
-              <div
-                key={ev.id}
-                className="flex items-center gap-3 py-2.5 px-3 rounded-lg hover:bg-slate-800/60 transition-colors group"
-              >
-                <span className="text-xs text-slate-500 font-mono w-8 text-right flex-shrink-0">
-                  {ev.minute}&apos;
-                </span>
-                <span className="text-base flex-shrink-0">{EVENT_ICONS[ev.type] ?? '•'}</span>
-                <div className="flex-1 min-w-0">
-                  <span className="text-sm text-white">
-                    {ev.playerName ?? <span className="text-slate-500 italic">Unknown player</span>}
-                  </span>
-                  {ev.assistName && (
-                    <span className="text-xs text-slate-500 ml-1">(assist: {ev.assistName})</span>
-                  )}
-                  {ev.playerOutName && (
-                    <span className="text-xs text-slate-500 ml-1">↔ {ev.playerOutName}</span>
-                  )}
-                  {ev.description && (
-                    <p className="text-xs text-slate-500 mt-0.5">{ev.description}</p>
-                  )}
-                </div>
-                <span className={`text-xs px-1.5 py-0.5 rounded flex-shrink-0 ${ev.side === 'home' ? 'bg-[#00E676]/10 text-[#00E676]' : 'bg-[#111111] text-[#888888]'}`}>
-                  {ev.side}
-                </span>
-                <button
-                  onClick={() => handleDelete(ev.id)}
-                  disabled={deletingId === ev.id}
-                  className="opacity-0 group-hover:opacity-100 text-slate-600 hover:text-red-400 transition-all text-xs flex-shrink-0 disabled:opacity-30"
-                  title="Delete event"
+            {sortedEvents.map((ev) => {
+              if (ev.type === 'half_time') {
+                return (
+                  <div key={ev.id} className="flex items-center gap-3 py-3 group">
+                    <div className="flex-1 border-t border-[#2a2a2a]" />
+                    <span className="text-xs text-[#555555] font-medium uppercase tracking-widest px-2 flex-shrink-0">
+                      Half Time — {ev.minute}&apos;
+                    </span>
+                    <div className="flex-1 border-t border-[#2a2a2a]" />
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(ev.id)}
+                      disabled={deletingId === ev.id}
+                      className="opacity-0 group-hover:opacity-100 text-slate-600 hover:text-red-400 transition-all flex-shrink-0 disabled:opacity-30"
+                      title="Remove half time marker"
+                    >
+                      {deletingId === ev.id ? '…' : (
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
+                          <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                );
+              }
+
+              return (
+                <div
+                  key={ev.id}
+                  className="flex items-center gap-3 py-2.5 px-3 rounded-lg hover:bg-slate-800/60 transition-colors group"
                 >
-                  {deletingId === ev.id ? '…' : (
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                      <path fillRule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clipRule="evenodd" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-            ))}
+                  <span className="text-xs text-slate-500 font-mono w-8 text-right flex-shrink-0">
+                    {ev.minute}&apos;
+                  </span>
+                  <span className="text-base flex-shrink-0">{EVENT_ICONS[ev.type] ?? '•'}</span>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm text-white">
+                      {ev.playerName ?? <span className="text-slate-500 italic">Unknown player</span>}
+                    </span>
+                    {ev.assistName && (
+                      <span className="text-xs text-slate-500 ml-1">(assist: {ev.assistName})</span>
+                    )}
+                    {ev.playerOutName && (
+                      <span className="text-xs text-slate-500 ml-1">↔ {ev.playerOutName}</span>
+                    )}
+                    {ev.description && (
+                      <p className="text-xs text-slate-500 mt-0.5">{ev.description}</p>
+                    )}
+                  </div>
+                  <span className={`text-xs px-1.5 py-0.5 rounded flex-shrink-0 ${ev.side === 'home' ? 'bg-[#00E676]/10 text-[#00E676]' : 'bg-[#111111] text-[#888888]'}`}>
+                    {ev.side}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(ev.id)}
+                    disabled={deletingId === ev.id}
+                    className="opacity-0 group-hover:opacity-100 text-slate-600 hover:text-red-400 transition-all text-xs flex-shrink-0 disabled:opacity-30"
+                    title="Delete event"
+                  >
+                    {deletingId === ev.id ? '…' : (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                        <path fillRule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
 
-      {/* Add Event Form */}
-      <form onSubmit={handleSubmit} className="bg-[#111111] border border-slate-800 rounded-xl p-6 space-y-4">
-        <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Add Event</h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <label className={labelCls()}>Minute <span className="text-red-500">*</span></label>
-            <input
-              type="number"
-              min={1}
-              max={120}
-              value={form.minute}
-              onChange={(e) => setField('minute', e.target.value)}
-              required
-              placeholder="e.g. 45"
-              className={inputCls()}
-            />
-          </div>
-          <div>
-            <label className={labelCls()}>Type <span className="text-red-500">*</span></label>
-            <select value={form.type} onChange={(e) => setField('type', e.target.value)} className={inputCls()}>
-              <option value="goal">Goal</option>
-              <option value="yellow_card">Yellow Card</option>
-              <option value="red_card">Red Card</option>
-              <option value="foul">Foul</option>
-              <option value="free_kick">Free Kick</option>
-              <option value="corner">Corner</option>
-              <option value="goal_kick">Goal Kick</option>
-              <option value="offside">Offside</option>
-              <option value="substitution">Substitution</option>
-              <option value="own_goal">Own Goal</option>
-              <option value="penalty">Penalty</option>
-            </select>
-          </div>
-          <div>
-            <label className={labelCls()}>Side <span className="text-red-500">*</span></label>
-            <select
-              value={form.side}
-              onChange={(e) => {
-                setField('side', e.target.value);
-                setField('playerName', '');
-                setField('assistName', '');
-                setField('playerOutName', '');
-              }}
-              className={inputCls()}
-            >
-              <option value="home">Home — {fixture.homeTeam}</option>
-              <option value="away">Away — {fixture.awayTeam}</option>
-            </select>
-          </div>
+      {/* Add Event Form — only available for ongoing fixtures */}
+      {fixture.status !== 'ongoing' ? (
+        <div className="bg-[#111111] border border-slate-800 rounded-xl px-5 py-6 text-center">
+          <p className="text-sm text-[#555555]">
+            Events can only be recorded while a fixture is <span className="text-[#aaaaaa]">ongoing (live)</span>.
+          </p>
         </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="bg-[#111111] border border-slate-800 rounded-xl p-6 space-y-4">
+          <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Add Event</h2>
 
-        {/* Player — dropdown from lineup */}
-        <div>
-          <label className={labelCls()}>Player</label>
-          {sideLineup.length > 0 ? (
-            <select
-              value={form.playerName}
-              onChange={(e) => setField('playerName', e.target.value)}
-              className={inputCls()}
-            >
-              <option value="">— Select player —</option>
-              {sideLineup.map((p) => (
-                <option key={p.id} value={p.fullName}>
-                  {p.jerseyNumber != null ? `#${p.jerseyNumber} ` : ''}{p.fullName}
-                </option>
-              ))}
-            </select>
-          ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className={labelCls()}>Minute <span className="text-red-500">*</span></label>
+              <input
+                type="number"
+                min={1}
+                max={120}
+                value={form.minute}
+                onChange={(e) => setField('minute', e.target.value)}
+                required
+                placeholder="e.g. 45"
+                className={inputCls()}
+              />
+            </div>
+            <div className={form.type === 'half_time' ? 'sm:col-span-2' : ''}>
+              <label className={labelCls()}>Type <span className="text-red-500">*</span></label>
+              <select title="Event type" value={form.type} onChange={(e) => setField('type', e.target.value)} className={inputCls()}>
+                <option value="goal">Goal</option>
+                <option value="yellow_card">Yellow Card</option>
+                <option value="red_card">Red Card</option>
+                <option value="foul">Foul</option>
+                <option value="free_kick">Free Kick</option>
+                <option value="corner">Corner</option>
+                <option value="goal_kick">Goal Kick</option>
+                <option value="offside">Offside</option>
+                <option value="substitution">Substitution</option>
+                <option value="own_goal">Own Goal</option>
+                <option value="penalty">Penalty</option>
+                <option value="half_time">Half Time</option>
+              </select>
+            </div>
+            {form.type !== 'half_time' && (
+              <div>
+                <label className={labelCls()}>Side <span className="text-red-500">*</span></label>
+                <select
+                  title="Side"
+                  value={form.side}
+                  onChange={(e) => {
+                    setField('side', e.target.value);
+                    setField('playerName', '');
+                    setField('assistName', '');
+                    setField('playerOutName', '');
+                  }}
+                  className={inputCls()}
+                >
+                  <option value="home">Home — {fixture.homeTeam}</option>
+                  <option value="away">Away — {fixture.awayTeam}</option>
+                </select>
+              </div>
+            )}
+          </div>
+
+          {/* Player, Assist, Sub fields — hidden for half_time */}
+          {form.type !== 'half_time' && (
+            <>
+              <div>
+                <label className={labelCls()}>Player</label>
+                {sideLineup.length > 0 ? (
+                  <select
+                    title="Player"
+                    value={form.playerName}
+                    onChange={(e) => setField('playerName', e.target.value)}
+                    className={inputCls()}
+                  >
+                    <option value="">— Select player —</option>
+                    {sideLineup.map((p) => (
+                      <option key={p.id} value={p.fullName}>
+                        {p.jerseyNumber != null ? `#${p.jerseyNumber} ` : ''}{p.fullName}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    value={form.playerName}
+                    onChange={(e) => setField('playerName', e.target.value)}
+                    placeholder="Player name (set lineup first for dropdown)"
+                    className={inputCls()}
+                  />
+                )}
+              </div>
+
+              {form.type === 'goal' && (
+                <div>
+                  <label className={labelCls()}>Assist</label>
+                  {sideLineup.length > 0 ? (
+                    <select
+                      value={form.assistName}
+                      onChange={(e) => setField('assistName', e.target.value)}
+                      title="Assist"
+                      className={inputCls()}
+                    >
+                      <option value="">— None —</option>
+                      {sideLineup.map((p) => (
+                        <option key={p.id} value={p.fullName}>
+                          {p.jerseyNumber != null ? `#${p.jerseyNumber} ` : ''}{p.fullName}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      value={form.assistName}
+                      onChange={(e) => setField('assistName', e.target.value)}
+                      placeholder="Assisting player (optional)"
+                      className={inputCls()}
+                    />
+                  )}
+                </div>
+              )}
+
+              {form.type === 'substitution' && (
+                <div>
+                  <label className={labelCls()}>Player Off</label>
+                  {sideLineup.length > 0 ? (
+                    <select
+                      value={form.playerOutName}
+                      onChange={(e) => setField('playerOutName', e.target.value)}
+                      title="Player Off"
+                      className={inputCls()}
+                    >
+                      <option value="">— Select player —</option>
+                      {sideLineup.map((p) => (
+                        <option key={p.id} value={p.fullName}>
+                          {p.jerseyNumber != null ? `#${p.jerseyNumber} ` : ''}{p.fullName}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      value={form.playerOutName}
+                      onChange={(e) => setField('playerOutName', e.target.value)}
+                      placeholder="Player coming off"
+                      className={inputCls()}
+                    />
+                  )}
+                </div>
+              )}
+            </>
+          )}
+
+          <div>
+            <label className={labelCls()}>Description</label>
             <input
               type="text"
-              value={form.playerName}
-              onChange={(e) => setField('playerName', e.target.value)}
-              placeholder="Player name (set lineup first for dropdown)"
+              value={form.description}
+              onChange={(e) => setField('description', e.target.value)}
+              placeholder="Optional note"
               className={inputCls()}
             />
+          </div>
+
+          {error && (
+            <div className="bg-red-900/30 border border-red-800 rounded-lg px-4 py-3 text-sm text-red-400">{error}</div>
           )}
-        </div>
 
-        {/* Conditional fields */}
-        {form.type === 'goal' && (
-          <div>
-            <label className={labelCls()}>Assist</label>
-            {sideLineup.length > 0 ? (
-              <select
-                value={form.assistName}
-                onChange={(e) => setField('assistName', e.target.value)}
-                title="Assist"
-                className={inputCls()}
-              >
-                <option value="">— None —</option>
-                {sideLineup.map((p) => (
-                  <option key={p.id} value={p.fullName}>
-                    {p.jerseyNumber != null ? `#${p.jerseyNumber} ` : ''}{p.fullName}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <input
-                type="text"
-                value={form.assistName}
-                onChange={(e) => setField('assistName', e.target.value)}
-                placeholder="Assisting player (optional)"
-                className={inputCls()}
-              />
-            )}
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={submitting}
+              className="bg-green-600 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg px-6 py-2 transition-colors"
+            >
+              {submitting ? 'Adding…' : (
+                <span className="flex items-center gap-1.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                    <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+                  </svg>
+                  Add
+                </span>
+              )}
+            </button>
           </div>
-        )}
-
-        {form.type === 'substitution' && (
-          <div>
-            <label className={labelCls()}>Player Off</label>
-            {sideLineup.length > 0 ? (
-              <select
-                value={form.playerOutName}
-                onChange={(e) => setField('playerOutName', e.target.value)}
-                title="Player Off"
-                className={inputCls()}
-              >
-                <option value="">— Select player —</option>
-                {sideLineup.map((p) => (
-                  <option key={p.id} value={p.fullName}>
-                    {p.jerseyNumber != null ? `#${p.jerseyNumber} ` : ''}{p.fullName}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <input
-                type="text"
-                value={form.playerOutName}
-                onChange={(e) => setField('playerOutName', e.target.value)}
-                placeholder="Player coming off"
-                className={inputCls()}
-              />
-            )}
-          </div>
-        )}
-
-        <div>
-          <label className={labelCls()}>Description</label>
-          <input
-            type="text"
-            value={form.description}
-            onChange={(e) => setField('description', e.target.value)}
-            placeholder="Optional note"
-            className={inputCls()}
-          />
-        </div>
-
-        {error && (
-          <div className="bg-red-900/30 border border-red-800 rounded-lg px-4 py-3 text-sm text-red-400">{error}</div>
-        )}
-
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            disabled={submitting}
-            className="bg-green-600 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg px-6 py-2 transition-colors"
-          >
-            {submitting ? 'Adding…' : (
-              <span className="flex items-center gap-1.5">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                  <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
-                </svg>
-                Add
-              </span>
-            )}
-          </button>
-        </div>
-      </form>
+        </form>
+      )}
     </div>
   );
 }
