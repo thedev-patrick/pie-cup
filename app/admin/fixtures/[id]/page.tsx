@@ -303,6 +303,23 @@ function MatchInfoTab({ fixture, onSaved }: { fixture: Fixture; onSaved: () => v
     fetch('/api/tournaments').then((r) => r.json()).then(setTournaments).catch(() => {});
   }, []);
 
+  // Sync recalculated scores back into the form whenever the fixture prop updates
+  // (scores change server-side when events are recorded from the Events tab)
+  useEffect(() => {
+    setForm((prev) => ({
+      ...prev,
+      scoreAtHalfTimeHome: fixture.scoreAtHalfTimeHome ?? 0,
+      scoreAtHalfTimeAway: fixture.scoreAtHalfTimeAway ?? 0,
+      scoreAt90Home: fixture.scoreAt90Home ?? 0,
+      scoreAt90Away: fixture.scoreAt90Away ?? 0,
+    }));
+  }, [
+    fixture.scoreAtHalfTimeHome,
+    fixture.scoreAtHalfTimeAway,
+    fixture.scoreAt90Home,
+    fixture.scoreAt90Away,
+  ]);
+
   function set(field: string, value: string | number | boolean) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
