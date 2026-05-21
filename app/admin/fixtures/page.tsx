@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
-import DeleteFixtureButton from './DeleteFixtureButton';
+import FixtureActionsMenu from './FixtureActionsMenu';
 
 export const dynamic = 'force-dynamic';
 
@@ -160,19 +160,8 @@ export default async function FixturesPage() {
                         <td className="px-4 py-3 text-[#888888] hidden md:table-cell">
                           {fixture._count.events}
                         </td>
-                        <td className="px-4 py-3 whitespace-nowrap">
-                          <Link
-                            href={`/admin/fixtures/${fixture.id}`}
-                            className="text-[#888888] hover:text-white transition-colors p-1"
-                            title="Manage fixture"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                              <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
-                            </svg>
-                          </Link>
-                          {fixture.status === 'scheduled' && (
-                            <DeleteFixtureButton fixtureId={fixture.id} />
-                          )}
+                        <td className="px-4 py-3">
+                          <FixtureActionsMenu fixtureId={fixture.id} canDelete={fixture.status === 'scheduled'} />
                         </td>
                       </tr>
                     ))}

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { ToastProvider } from './components/ToastProvider';
 
 const navLinks = [
   { href: '/admin', label: 'Dashboard' },
@@ -17,10 +18,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
 
   if (pathname === '/admin/login') {
-    return <>{children}</>;
+    return <ToastProvider>{children}</ToastProvider>;
   }
 
   return (
+    <ToastProvider>
     <div className="flex min-h-screen bg-[#000000]">
 
       {/* ── Desktop sidebar ── */}
@@ -111,5 +113,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </main>
       </div>
     </div>
+    </ToastProvider>
   );
 }
