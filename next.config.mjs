@@ -1,6 +1,8 @@
 const nextConfig = {
   reactStrictMode: true,
-  serverExternalPackages: ['pdfkit'],
+  experimental: {
+    serverComponentsExternalPackages: ['pdfkit'],
+  },
 };
 
 export default nextConfig;
