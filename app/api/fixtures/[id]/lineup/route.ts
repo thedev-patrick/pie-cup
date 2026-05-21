@@ -32,6 +32,28 @@ export async function POST(
       return NextResponse.json({ error: 'lineups must be an array' }, { status: 400 });
     }
 
+    // Validate per-side limits
+    const sideCounts: Record<string, { starters: number; subs: number }> = {};
+    for (const entry of lineups) {
+      if (!sideCounts[entry.side]) sideCounts[entry.side] = { starters: 0, subs: 0 };
+      if (entry.role === 'starter') sideCounts[entry.side].starters++;
+      else sideCounts[entry.side].subs++;
+    }
+    for (const [side, counts] of Object.entries(sideCounts)) {
+      if (counts.starters > 11) {
+        return NextResponse.json(
+          { error: `The ${side} team cannot have more than 11 starters (currently ${counts.starters})` },
+          { status: 400 },
+        );
+      }
+      if (counts.subs > 5) {
+        return NextResponse.json(
+          { error: `The ${side} team cannot have more than 5 substitutes (currently ${counts.subs})` },
+          { status: 400 },
+        );
+      }
+    }
+
     const result = await prisma.$transaction(async (tx) => {
       await tx.matchLineup.deleteMany({ where: { fixtureId: params.id } });
 

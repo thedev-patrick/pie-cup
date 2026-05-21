@@ -28,6 +28,25 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     const body = await request.json();
 
+    // Block "ongoing" if either side has fewer than 11 starters in the lineup
+    if (body.status === 'ongoing' && existing.status !== 'ongoing') {
+      const lineups = await prisma.matchLineup.findMany({ where: { fixtureId: params.id } });
+      const homeStarters = lineups.filter((l) => l.side === 'home' && l.role === 'starter').length;
+      const awayStarters = lineups.filter((l) => l.side === 'away' && l.role === 'starter').length;
+      if (homeStarters < 11) {
+        return NextResponse.json(
+          { error: `Cannot set to ongoing: home team has only ${homeStarters} starter(s) — at least 11 required` },
+          { status: 400 },
+        );
+      }
+      if (awayStarters < 11) {
+        return NextResponse.json(
+          { error: `Cannot set to ongoing: away team has only ${awayStarters} starter(s) — at least 11 required` },
+          { status: 400 },
+        );
+      }
+    }
+
     const updated = await prisma.fixture.update({
       where: { id: params.id },
       data: {

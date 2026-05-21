@@ -210,13 +210,17 @@ function TeamColumn({ title, players, side, playerState, onToggle, onUpdate }: T
         <div className="space-y-1">
           {starters.length > 0 && (
             <>
-              <p className="text-xs text-slate-500 uppercase tracking-wider px-3 mb-1 mt-2">Starting XI ({starters.length})</p>
+              <p className={`text-xs uppercase tracking-wider px-3 mb-1 mt-2 ${starters.length > 11 ? 'text-red-400 font-semibold' : 'text-slate-500'}`}>
+                Starting XI ({starters.length}/11){starters.length > 11 ? ' — exceeds limit!' : ''}
+              </p>
               {starters.map((p) => <PlayerRow key={p.id} player={p} defaultPosition={p.position ?? ''} playerState={playerState} onToggle={onToggle} onUpdate={onUpdate} />)}
             </>
           )}
           {subs.length > 0 && (
             <>
-              <p className="text-xs text-slate-500 uppercase tracking-wider px-3 mb-1 mt-3">Substitutes ({subs.length})</p>
+              <p className={`text-xs uppercase tracking-wider px-3 mb-1 mt-3 ${subs.length > 5 ? 'text-red-400 font-semibold' : 'text-slate-500'}`}>
+                Substitutes ({subs.length}/5){subs.length > 5 ? ' — exceeds limit!' : ''}
+              </p>
               {subs.map((p) => <PlayerRow key={p.id} player={p} defaultPosition={p.position ?? ''} playerState={playerState} onToggle={onToggle} onUpdate={onUpdate} />)}
             </>
           )}
@@ -545,6 +549,18 @@ function LineupTab({ fixture, teams, onSaved }: { fixture: Fixture; teams: Team[
     setSaving(true);
     setError(null);
     setSaved(false);
+
+    // Client-side limit check before hitting the API
+    const homeStarters = homePlayers.filter((p) => playerState[p.id]?.checked && playerState[p.id]?.role === 'starter').length;
+    const homeSubs = homePlayers.filter((p) => playerState[p.id]?.checked && playerState[p.id]?.role === 'substitute').length;
+    const awayStarters = awayPlayers.filter((p) => playerState[p.id]?.checked && playerState[p.id]?.role === 'starter').length;
+    const awaySubs = awayPlayers.filter((p) => playerState[p.id]?.checked && playerState[p.id]?.role === 'substitute').length;
+
+    if (homeStarters > 11) { setError(`Home team has ${homeStarters} starters — maximum is 11.`); setSaving(false); return; }
+    if (homeSubs > 5) { setError(`Home team has ${homeSubs} substitutes — maximum is 5.`); setSaving(false); return; }
+    if (awayStarters > 11) { setError(`Away team has ${awayStarters} starters — maximum is 11.`); setSaving(false); return; }
+    if (awaySubs > 5) { setError(`Away team has ${awaySubs} substitutes — maximum is 5.`); setSaving(false); return; }
+
     try {
       const payload = Object.entries(playerState)
         .filter(([, s]) => s.checked)
