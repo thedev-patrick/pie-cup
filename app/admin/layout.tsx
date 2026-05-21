@@ -36,6 +36,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Link
               key={link.href}
               href={link.href}
+              prefetch={false}
               className={`font-condensed font-bold text-sm uppercase tracking-wider block px-3 py-2.5 transition-colors rounded-r-lg ${
                 pathname === link.href
                   ? 'bg-[#00E676]/10 text-[#00E676] border-l-2 border-[#00E676]'
@@ -91,6 +92,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Link
                 key={link.href}
                 href={link.href}
+                prefetch={false}
                 onClick={() => setMenuOpen(false)}
                 className={`font-condensed font-bold text-sm uppercase tracking-wider block rounded-lg px-3 py-2.5 transition-colors ${
                   pathname === link.href
