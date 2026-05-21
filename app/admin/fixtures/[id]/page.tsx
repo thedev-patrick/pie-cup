@@ -136,48 +136,79 @@ interface PlayerRowProps {
   player: Player;
   defaultPosition: string;
   playerState: Record<string, LineupPlayerState>;
-  onToggle: (playerId: string, defaultPosition: string) => void;
+  onAdd: (playerId: string, role: 'starter' | 'substitute', defaultPosition: string) => void;
+  onRemove: (playerId: string) => void;
   onUpdate: (playerId: string, field: 'role' | 'position', value: string) => void;
 }
 
-function PlayerRow({ player, defaultPosition, playerState, onToggle, onUpdate }: PlayerRowProps) {
+function PlayerRow({ player, defaultPosition, playerState, onAdd, onRemove, onUpdate }: PlayerRowProps) {
   const state = playerState[player.id];
   const checked = state?.checked ?? false;
+
   return (
-    <div className={`flex items-center gap-2 py-2 px-3 rounded-lg transition-colors ${checked ? 'bg-slate-800' : 'hover:bg-slate-800/40'}`}>
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={() => onToggle(player.id, defaultPosition)}
-        aria-label={`Select ${player.fullName}`}
-        className="w-4 h-4 accent-green-500 flex-shrink-0"
-      />
+    <div className={`flex items-center gap-2 py-2 px-3 rounded-lg transition-colors ${checked ? 'bg-slate-800' : 'hover:bg-slate-800/40 group'}`}>
       {player.jerseyNumber != null && (
         <span className="bg-slate-700 text-slate-300 text-xs font-bold rounded px-1.5 py-0.5 flex-shrink-0 min-w-[1.75rem] text-center">
           {player.jerseyNumber}
         </span>
       )}
-      <span className={`text-sm flex-1 truncate ${checked ? 'text-white' : 'text-slate-400'}`}>
+      <span className={`text-sm flex-1 truncate min-w-0 ${checked ? 'text-white' : 'text-slate-400'}`}>
         {player.fullName}
       </span>
-      {checked && (
+
+      {checked ? (
         <>
           <input
             type="text"
             value={state?.position ?? ''}
             onChange={(e) => onUpdate(player.id, 'position', e.target.value)}
-            placeholder="Position"
-            className="w-20 bg-slate-700 border border-slate-600 rounded px-2 py-1 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-slate-500 transition-colors"
+            placeholder="Pos."
+            className="w-16 bg-slate-700 border border-slate-600 rounded px-2 py-1 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-slate-500 transition-colors flex-shrink-0"
           />
-          <select
-            value={state?.role ?? 'starter'}
-            onChange={(e) => onUpdate(player.id, 'role', e.target.value as 'starter' | 'substitute')}
-            className="bg-slate-700 border border-slate-600 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-slate-500 transition-colors"
+          <div className="flex rounded overflow-hidden border border-slate-600 flex-shrink-0">
+            <button
+              type="button"
+              onClick={() => onUpdate(player.id, 'role', 'starter')}
+              className={`px-2 py-1 text-xs font-medium transition-colors ${state?.role === 'starter' ? 'bg-[#00E676] text-black' : 'bg-slate-700 text-slate-400 hover:bg-slate-600'}`}
+            >
+              XI
+            </button>
+            <button
+              type="button"
+              onClick={() => onUpdate(player.id, 'role', 'substitute')}
+              className={`px-2 py-1 text-xs font-medium transition-colors ${state?.role === 'substitute' ? 'bg-blue-500 text-white' : 'bg-slate-700 text-slate-400 hover:bg-slate-600'}`}
+            >
+              Sub
+            </button>
+          </div>
+          <button
+            type="button"
+            onClick={() => onRemove(player.id)}
+            aria-label={`Remove ${player.fullName}`}
+            className="text-slate-600 hover:text-red-400 transition-colors flex-shrink-0"
           >
-            <option value="starter">Starter</option>
-            <option value="substitute">Sub</option>
-          </select>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+              <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+            </svg>
+          </button>
         </>
+      ) : (
+        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+          <button
+            type="button"
+            onClick={() => onAdd(player.id, 'starter', defaultPosition)}
+            className="px-2 py-1 text-xs font-medium rounded bg-[#00E676]/10 text-[#00E676] hover:bg-[#00E676]/20 transition-colors"
+          >
+            + XI
+          </button>
+          <button
+            type="button"
+            onClick={() => onAdd(player.id, 'substitute', defaultPosition)}
+            className="px-2 py-1 text-xs font-medium rounded bg-blue-900/40 text-blue-400 hover:bg-blue-900/60 transition-colors"
+          >
+            + Sub
+          </button>
+        </div>
       )}
     </div>
   );
@@ -188,14 +219,15 @@ interface TeamColumnProps {
   players: Player[];
   side: 'home' | 'away';
   playerState: Record<string, LineupPlayerState>;
-  onToggle: (playerId: string, defaultPosition: string) => void;
+  onAdd: (playerId: string, role: 'starter' | 'substitute', defaultPosition: string) => void;
+  onRemove: (playerId: string) => void;
   onUpdate: (playerId: string, field: 'role' | 'position', value: string) => void;
 }
 
-function TeamColumn({ title, players, side, playerState, onToggle, onUpdate }: TeamColumnProps) {
+function TeamColumn({ title, players, side, playerState, onAdd, onRemove, onUpdate }: TeamColumnProps) {
   const starters = players.filter((p) => playerState[p.id]?.checked && playerState[p.id]?.role === 'starter');
   const subs = players.filter((p) => playerState[p.id]?.checked && playerState[p.id]?.role === 'substitute');
-  const unchecked = players.filter((p) => !playerState[p.id]?.checked);
+  const squad = players.filter((p) => !playerState[p.id]?.checked);
   return (
     <div className="flex-1 min-w-0">
       <div className="flex items-center gap-2 mb-3">
@@ -213,7 +245,7 @@ function TeamColumn({ title, players, side, playerState, onToggle, onUpdate }: T
               <p className={`text-xs uppercase tracking-wider px-3 mb-1 mt-2 ${starters.length > 11 ? 'text-red-400 font-semibold' : 'text-slate-500'}`}>
                 Starting XI ({starters.length}/11){starters.length > 11 ? ' — exceeds limit!' : ''}
               </p>
-              {starters.map((p) => <PlayerRow key={p.id} player={p} defaultPosition={p.position ?? ''} playerState={playerState} onToggle={onToggle} onUpdate={onUpdate} />)}
+              {starters.map((p) => <PlayerRow key={p.id} player={p} defaultPosition={p.position ?? ''} playerState={playerState} onAdd={onAdd} onRemove={onRemove} onUpdate={onUpdate} />)}
             </>
           )}
           {subs.length > 0 && (
@@ -221,13 +253,15 @@ function TeamColumn({ title, players, side, playerState, onToggle, onUpdate }: T
               <p className={`text-xs uppercase tracking-wider px-3 mb-1 mt-3 ${subs.length > 5 ? 'text-red-400 font-semibold' : 'text-slate-500'}`}>
                 Substitutes ({subs.length}/5){subs.length > 5 ? ' — exceeds limit!' : ''}
               </p>
-              {subs.map((p) => <PlayerRow key={p.id} player={p} defaultPosition={p.position ?? ''} playerState={playerState} onToggle={onToggle} onUpdate={onUpdate} />)}
+              {subs.map((p) => <PlayerRow key={p.id} player={p} defaultPosition={p.position ?? ''} playerState={playerState} onAdd={onAdd} onRemove={onRemove} onUpdate={onUpdate} />)}
             </>
           )}
-          {unchecked.length > 0 && (
+          {squad.length > 0 && (
             <>
-              <p className="text-xs text-slate-500 uppercase tracking-wider px-3 mb-1 mt-3">Squad</p>
-              {unchecked.map((p) => <PlayerRow key={p.id} player={p} defaultPosition={p.position ?? ''} playerState={playerState} onToggle={onToggle} onUpdate={onUpdate} />)}
+              <p className="text-xs text-slate-500 uppercase tracking-wider px-3 mb-1 mt-3">
+                Squad — hover to add
+              </p>
+              {squad.map((p) => <PlayerRow key={p.id} player={p} defaultPosition={p.position ?? ''} playerState={playerState} onAdd={onAdd} onRemove={onRemove} onUpdate={onUpdate} />)}
             </>
           )}
         </div>
@@ -520,22 +554,22 @@ function LineupTab({ fixture, teams, onSaved }: { fixture: Fixture; teams: Team[
     ? awayTeams.flatMap((t) => t.players)
     : [];
 
-  function togglePlayer(playerId: string, defaultPosition: string) {
-    setPlayerState((prev) => {
-      const current = prev[playerId];
-      if (current?.checked) {
-        const next = { ...current, checked: false };
-        return { ...prev, [playerId]: next };
-      }
-      return {
-        ...prev,
-        [playerId]: {
-          checked: true,
-          role: 'starter',
-          position: current?.position ?? defaultPosition,
-        },
-      };
-    });
+  function addPlayer(playerId: string, role: 'starter' | 'substitute', defaultPosition: string) {
+    setPlayerState((prev) => ({
+      ...prev,
+      [playerId]: {
+        checked: true,
+        role,
+        position: prev[playerId]?.position ?? defaultPosition,
+      },
+    }));
+  }
+
+  function removePlayer(playerId: string) {
+    setPlayerState((prev) => ({
+      ...prev,
+      [playerId]: { ...prev[playerId], checked: false },
+    }));
   }
 
   function updatePlayerField(playerId: string, field: 'role' | 'position', value: string) {
@@ -598,10 +632,10 @@ function LineupTab({ fixture, teams, onSaved }: { fixture: Fixture; teams: Team[
     <div className="space-y-4">
       <div className="bg-[#111111] border border-slate-800 rounded-xl p-6">
         <div className="flex flex-col sm:flex-row gap-6 sm:gap-8">
-          <TeamColumn title={fixture.homeTeam} players={homePlayers} side="home" playerState={playerState} onToggle={togglePlayer} onUpdate={updatePlayerField} />
+          <TeamColumn title={fixture.homeTeam} players={homePlayers} side="home" playerState={playerState} onAdd={addPlayer} onRemove={removePlayer} onUpdate={updatePlayerField} />
           <div className="hidden sm:block w-px bg-slate-800 self-stretch" />
           <div className="block sm:hidden h-px bg-slate-800 w-full" />
-          <TeamColumn title={fixture.awayTeam} players={awayPlayers} side="away" playerState={playerState} onToggle={togglePlayer} onUpdate={updatePlayerField} />
+          <TeamColumn title={fixture.awayTeam} players={awayPlayers} side="away" playerState={playerState} onAdd={addPlayer} onRemove={removePlayer} onUpdate={updatePlayerField} />
         </div>
       </div>
 
