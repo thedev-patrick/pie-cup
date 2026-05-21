@@ -91,8 +91,15 @@ const EVENT_ICONS: Record<string, string> = {
   corner: '↪️',
   goal_kick: '🥅',
   offside: '🚫',
-  half_time: '⏸️',
 };
+
+function WhistleIcon({ className = 'w-3.5 h-3.5' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M12 6H8.5C6.01 6 4 8.01 4 10.5S6.01 15 8.5 15c1.64 0 3.08-.9 3.85-2.24L20 14v-3h-2V9h-2V7h-2.5L12 6zM8.5 13C7.12 13 6 11.88 6 10.5S7.12 8 8.5 8 11 9.12 11 10.5 9.88 13 8.5 13z" />
+    </svg>
+  );
+}
 
 function inputCls(extra = '') {
   return `w-full bg-[#1a1a1a] border border-[#222222] rounded-lg px-3 py-2 text-white placeholder-[#333333] text-sm focus:outline-none focus:border-[#00E676] focus:ring-1 focus:ring-[#00E676] transition-colors ${extra}`;
@@ -772,12 +779,14 @@ function EventsTab({ fixture, onRefresh }: { fixture: Fixture; onRefresh: () => 
         ) : (
           <div className="space-y-1">
             {sortedEvents.map((ev) => {
-              if (ev.type === 'half_time') {
+              if (ev.type === 'half_time' || ev.type === 'full_time') {
+                const label = ev.type === 'half_time' ? 'Half Time' : 'Full Time';
                 return (
                   <div key={ev.id} className="flex items-center gap-3 py-3 group">
                     <div className="flex-1 border-t border-[#2a2a2a]" />
-                    <span className="text-xs text-[#555555] font-medium uppercase tracking-widest px-2 flex-shrink-0">
-                      Half Time — {ev.minute}&apos;
+                    <span className="flex items-center gap-1.5 text-xs text-[#555555] font-medium uppercase tracking-widest px-2 flex-shrink-0">
+                      <WhistleIcon className="w-3.5 h-3.5" />
+                      {label}
                     </span>
                     <div className="flex-1 border-t border-[#2a2a2a]" />
                     <button
@@ -785,7 +794,7 @@ function EventsTab({ fixture, onRefresh }: { fixture: Fixture; onRefresh: () => 
                       onClick={() => handleDelete(ev.id)}
                       disabled={deletingId === ev.id}
                       className="opacity-0 group-hover:opacity-100 text-slate-600 hover:text-red-400 transition-all flex-shrink-0 disabled:opacity-30"
-                      title="Remove half time marker"
+                      title={`Remove ${label.toLowerCase()} marker`}
                     >
                       {deletingId === ev.id ? '…' : (
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
@@ -868,7 +877,7 @@ function EventsTab({ fixture, onRefresh }: { fixture: Fixture; onRefresh: () => 
                 className={inputCls()}
               />
             </div>
-            <div className={form.type === 'half_time' ? 'sm:col-span-2' : ''}>
+            <div className={(form.type === 'half_time' || form.type === 'full_time') ? 'sm:col-span-2' : ''}>
               <label className={labelCls()}>Type <span className="text-red-500">*</span></label>
               <select title="Event type" value={form.type} onChange={(e) => setField('type', e.target.value)} className={inputCls()}>
                 <option value="goal">Goal</option>
@@ -883,9 +892,10 @@ function EventsTab({ fixture, onRefresh }: { fixture: Fixture; onRefresh: () => 
                 <option value="own_goal">Own Goal</option>
                 <option value="penalty">Penalty</option>
                 <option value="half_time">Half Time</option>
+                <option value="full_time">Full Time</option>
               </select>
             </div>
-            {form.type !== 'half_time' && (
+            {form.type !== 'half_time' && form.type !== 'full_time' && (
               <div>
                 <label className={labelCls()}>Side <span className="text-red-500">*</span></label>
                 <select
@@ -907,7 +917,7 @@ function EventsTab({ fixture, onRefresh }: { fixture: Fixture; onRefresh: () => 
           </div>
 
           {/* Player, Assist, Sub fields — hidden for half_time */}
-          {form.type !== 'half_time' && (
+          {form.type !== 'half_time' && form.type !== 'full_time' && (
             <>
               <div>
                 <label className={labelCls()}>Player</label>

@@ -30,6 +30,14 @@ function eventIcon(type: string) {
   }
 }
 
+function WhistleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 inline-block" aria-hidden="true">
+      <path d="M12 6H8.5C6.01 6 4 8.01 4 10.5S6.01 15 8.5 15c1.64 0 3.08-.9 3.85-2.24L20 14v-3h-2V9h-2V7h-2.5L12 6zM8.5 13C7.12 13 6 11.88 6 10.5S7.12 8 8.5 8 11 9.12 11 10.5 9.88 13 8.5 13z" />
+    </svg>
+  );
+}
+
 function getPositionBadgeClasses(position?: string | null) {
   const normalized = position?.trim().toLowerCase() ?? '';
   if (normalized.includes('def')) {
@@ -366,72 +374,88 @@ export default async function FixturePage({
           <div className="bg-[#111111] border border-[#1a1a1a] rounded-xl p-6">
             <h2 className="ea-section-title mb-5">MATCH EVENTS</h2>
             <ol className="space-y-0">
-              {fixture.events.map((event) => (
-                <li
-                  key={event.id}
-                  className="flex items-start gap-3 text-sm py-3 border-b border-[#1a1a1a] last:border-0"
-                >
-                  {/* Minute badge */}
-                  <span className="bg-[#1a1a1a] border border-[#2e2e2e] rounded text-xs px-2 py-0.5 text-[#3d6b3d] font-mono tabular-nums shrink-0 mt-0.5">
-                    {event.minute}&apos;
-                  </span>
+              {fixture.events.map((event) => {
+                if (event.type === 'half_time' || event.type === 'full_time') {
+                  const label = event.type === 'half_time' ? 'Half Time' : 'Full Time';
+                  return (
+                    <li key={event.id} className="flex items-center gap-3 py-3 border-b border-[#1a1a1a] last:border-0">
+                      <div className="flex-1 border-t border-[#1a1a1a]" />
+                      <span className="flex items-center gap-1.5 text-[#3d6b3d] font-condensed font-bold text-xs uppercase tracking-widest flex-shrink-0">
+                        <WhistleIcon />
+                        {label}
+                      </span>
+                      <div className="flex-1 border-t border-[#1a1a1a]" />
+                    </li>
+                  );
+                }
 
-                  {/* Icon */}
-                  <span className="text-base shrink-0 mt-[-1px]">
-                    {eventIcon(event.type)}
-                  </span>
-
-                  {/* Description */}
-                  <div className="flex-1 min-w-0">
-                    {event.type === 'substitution' ? (
-                      <span>
-                        <span className="text-[#00E676]">↑</span>{' '}
-                        <span className="text-white font-semibold">
-                          {event.playerName ?? '—'}
-                        </span>
-                        {event.playerOutName && (
-                          <>
-                            {' '}
-                            <span className="text-[#3d6b3d]">↓</span>{' '}
-                            <span className="text-[#3d6b3d]">{event.playerOutName}</span>
-                          </>
-                        )}
-                      </span>
-                    ) : event.type === 'own_goal' ? (
-                      <span>
-                        <span className="text-white font-semibold">
-                          {event.playerName ?? '—'}
-                        </span>{' '}
-                        <span className="ea-label">(OG)</span>
-                      </span>
-                    ) : event.type === 'goal' || event.type === 'penalty' ? (
-                      <span>
-                        <span className="text-white font-semibold">
-                          {event.playerName ?? '—'}
-                        </span>
-                        {event.assistName && (
-                          <span className="text-[#3d6b3d] text-xs ml-1.5">
-                            (assist: {event.assistName})
-                          </span>
-                        )}
-                      </span>
-                    ) : (
-                      <span className="text-white font-semibold">
-                        {event.playerName ?? event.description ?? '—'}
-                      </span>
-                    )}
-
-                    {/* Team side pill */}
-                    <span
-                      className={`ml-2 font-condensed font-bold text-[10px] uppercase tracking-widest ${
-                        event.side === 'home' ? 'text-[#00E676]' : 'text-[#3d6b3d]'
-                      }`}
-                    >
-                      {event.side === 'home' ? fixture.homeTeam : fixture.awayTeam}
+                return (
+                  <li
+                    key={event.id}
+                    className="flex items-start gap-3 text-sm py-3 border-b border-[#1a1a1a] last:border-0"
+                  >
+                    {/* Minute badge */}
+                    <span className="bg-[#1a1a1a] border border-[#2e2e2e] rounded text-xs px-2 py-0.5 text-[#3d6b3d] font-mono tabular-nums shrink-0 mt-0.5">
+                      {event.minute}&apos;
                     </span>
-                  </div>
-                </li>
-              ))}
+
+                    {/* Icon */}
+                    <span className="text-base shrink-0 mt-[-1px]">
+                      {eventIcon(event.type)}
+                    </span>
+
+                    {/* Description */}
+                    <div className="flex-1 min-w-0">
+                      {event.type === 'substitution' ? (
+                        <span>
+                          <span className="text-[#00E676]">↑</span>{' '}
+                          <span className="text-white font-semibold">
+                            {event.playerName ?? '—'}
+                          </span>
+                          {event.playerOutName && (
+                            <>
+                              {' '}
+                              <span className="text-[#3d6b3d]">↓</span>{' '}
+                              <span className="text-[#3d6b3d]">{event.playerOutName}</span>
+                            </>
+                          )}
+                        </span>
+                      ) : event.type === 'own_goal' ? (
+                        <span>
+                          <span className="text-white font-semibold">
+                            {event.playerName ?? '—'}
+                          </span>{' '}
+                          <span className="ea-label">(OG)</span>
+                        </span>
+                      ) : event.type === 'goal' || event.type === 'penalty' ? (
+                        <span>
+                          <span className="text-white font-semibold">
+                            {event.playerName ?? '—'}
+                          </span>
+                          {event.assistName && (
+                            <span className="text-[#3d6b3d] text-xs ml-1.5">
+                              (assist: {event.assistName})
+                            </span>
+                          )}
+                        </span>
+                      ) : (
+                        <span className="text-white font-semibold">
+                          {event.playerName ?? event.description ?? '—'}
+                        </span>
+                      )}
+
+                      {/* Team side pill */}
+                      <span
+                        className={`ml-2 font-condensed font-bold text-[10px] uppercase tracking-widest ${
+                          event.side === 'home' ? 'text-[#00E676]' : 'text-[#3d6b3d]'
+                        }`}
+                      >
+                        {event.side === 'home' ? fixture.homeTeam : fixture.awayTeam}
+                      </span>
+                    </div>
+                  </li>
+                );
+              })}
             </ol>
           </div>
         )}

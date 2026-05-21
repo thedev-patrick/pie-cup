@@ -4,6 +4,8 @@ import FixtureActionsMenu from './FixtureActionsMenu';
 
 export const dynamic = 'force-dynamic';
 
+const PAGE_SIZE = 10;
+
 function StatusBadge({ status }: { status: string }) {
   const s = status.toLowerCase();
   if (s === 'ongoing' || s === 'live') {
@@ -27,27 +29,63 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-export default async function FixturesPage() {
-  const fixtures = await prisma.fixture.findMany({
+function Pagination({
+  page,
+  totalPages,
+  buildHref,
+}: {
+  page: number;
+  totalPages: number;
+  buildHref: (p: number) => string;
+}) {
+  if (totalPages <= 1) return null;
+  return (
+    <div className="flex items-center justify-between pt-3 px-1">
+      <span className="text-xs text-[#555555]">
+        Page {page} of {totalPages}
+      </span>
+      <div className="flex gap-2">
+        {page > 1 && (
+          <Link
+            href={buildHref(page - 1)}
+            className="text-xs text-[#888888] hover:text-white border border-[#2a2a2a] hover:border-[#444444] rounded-lg px-3 py-1.5 transition-colors"
+          >
+            ← Prev
+          </Link>
+        )}
+        {page < totalPages && (
+          <Link
+            href={buildHref(page + 1)}
+            className="text-xs text-[#888888] hover:text-white border border-[#2a2a2a] hover:border-[#444444] rounded-lg px-3 py-1.5 transition-colors"
+          >
+            Next →
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default async function FixturesPage({
+  searchParams,
+}: {
+  searchParams: Record<string, string | string[] | undefined>;
+}) {
+  const allFixtures = await prisma.fixture.findMany({
     orderBy: { date: 'asc' },
     include: {
       tournament: { select: { id: true, name: true, season: true } },
-      _count: {
-        select: {
-          events: true,
-          lineups: true,
-        },
-      },
+      _count: { select: { events: true, lineups: true } },
     },
   });
 
-  // Group fixtures by tournament
+  // Group by tournament
   const grouped = new Map<
     string,
-    { label: string; season: string | null; fixtures: typeof fixtures }
+    { label: string; season: string | null; fixtures: typeof allFixtures }
   >();
 
-  for (const fixture of fixtures) {
+  for (const fixture of allFixtures) {
     const key = fixture.tournamentId ?? '__none__';
     if (!grouped.has(key)) {
       grouped.set(key, {
@@ -59,16 +97,33 @@ export default async function FixturesPage() {
     grouped.get(key)!.fixtures.push(fixture);
   }
 
-  // Put "No Tournament" at the end
   const sortedGroups = [...grouped.entries()].sort(([a], [b]) => {
     if (a === '__none__') return 1;
     if (b === '__none__') return -1;
     return 0;
   });
 
+  // Per-group page params: ?page_{key}=N
+  function getPage(key: string): number {
+    const raw = searchParams[`page_${key}`];
+    const n = parseInt(Array.isArray(raw) ? raw[0] : raw ?? '1', 10);
+    return isNaN(n) || n < 1 ? 1 : n;
+  }
+
+  function buildHref(key: string, p: number): string {
+    const params = new URLSearchParams();
+    for (const [k, v] of Object.entries(searchParams)) {
+      if (k.startsWith('page_') && k !== `page_${key}`) {
+        params.set(k, Array.isArray(v) ? v[0] : (v ?? '1'));
+      }
+    }
+    if (p > 1) params.set(`page_${key}`, String(p));
+    const qs = params.toString();
+    return `/admin/fixtures${qs ? `?${qs}` : ''}`;
+  }
+
   return (
     <div>
-      {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold text-white">Fixtures</h1>
         <Link
@@ -84,92 +139,83 @@ export default async function FixturesPage() {
         </Link>
       </div>
 
-      {fixtures.length === 0 ? (
+      {allFixtures.length === 0 ? (
         <div className="bg-[#111111] border border-[#1a1a1a] rounded-xl p-10 text-center">
           <p className="text-[#666666] text-sm">No fixtures yet. Create your first fixture to get started.</p>
         </div>
       ) : (
         <div className="space-y-8">
-          {sortedGroups.map(([key, group]) => (
-            <div key={key}>
-              {/* Tournament header */}
-              <div className="flex items-center gap-3 mb-3">
-                <h2 className="text-sm font-semibold text-white">
-                  {group.label}
-                </h2>
-                {group.season && (
-                  <span className="text-xs text-[#555555]">{group.season}</span>
-                )}
-                <span className="text-xs text-[#444444]">
-                  {group.fixtures.length} fixture{group.fixtures.length !== 1 ? 's' : ''}
-                </span>
-              </div>
+          {sortedGroups.map(([key, group]) => {
+            const page = getPage(key);
+            const totalPages = Math.ceil(group.fixtures.length / PAGE_SIZE);
+            const paginated = group.fixtures.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-              <div className="bg-[#111111] rounded-xl border border-[#1a1a1a] overflow-x-auto">
-                <table className="w-full text-sm min-w-[560px]">
-                  <thead>
-                    <tr className="border-b border-[#1a1a1a]">
-                      <th className="text-left text-xs font-medium text-[#666666] uppercase tracking-wider px-4 py-3 hidden sm:table-cell">
-                        Matchday
-                      </th>
-                      <th className="text-left text-xs font-medium text-[#666666] uppercase tracking-wider px-4 py-3">
-                        Match
-                      </th>
-                      <th className="text-left text-xs font-medium text-[#666666] uppercase tracking-wider px-4 py-3">
-                        Date
-                      </th>
-                      <th className="text-left text-xs font-medium text-[#666666] uppercase tracking-wider px-4 py-3">
-                        Status
-                      </th>
-                      <th className="text-left text-xs font-medium text-[#666666] uppercase tracking-wider px-4 py-3 hidden md:table-cell">
-                        Lineup
-                      </th>
-                      <th className="text-left text-xs font-medium text-[#666666] uppercase tracking-wider px-4 py-3 hidden md:table-cell">
-                        Events
-                      </th>
-                      <th className="text-left text-xs font-medium text-[#666666] uppercase tracking-wider px-4 py-3">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#1a1a1a]">
-                    {group.fixtures.map((fixture) => (
-                      <tr key={fixture.id} className="hover:bg-[#1a1a1a]/40 transition-colors">
-                        <td className="px-4 py-3 text-[#888888] hidden sm:table-cell">
-                          {fixture.matchday ?? <span className="text-[#444444]">—</span>}
-                        </td>
-                        <td className="px-4 py-3 text-white font-medium">
-                          {fixture.homeTeam} <span className="text-[#666666] font-normal">vs</span> {fixture.awayTeam}
-                        </td>
-                        <td className="px-4 py-3 text-[#888888] whitespace-nowrap">
-                          {new Date(fixture.date).toLocaleDateString('en-GB', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                          })}
-                          {fixture.kickOffTime && (
-                            <span className="text-[#444444] ml-1 hidden sm:inline">{fixture.kickOffTime}</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3">
-                          <StatusBadge status={fixture.status} />
-                        </td>
-                        <td className="px-4 py-3 text-[#888888] hidden md:table-cell">
-                          {fixture._count.lineups}
-                        </td>
-                        <td className="px-4 py-3 text-[#888888] hidden md:table-cell">
-                          {fixture._count.events}
-                        </td>
-                        <td className="px-4 py-3">
-                          <FixtureActionsMenu fixtureId={fixture.id} canDelete={fixture.status === 'scheduled'} />
-                        </td>
+            return (
+              <div key={key}>
+                <div className="flex items-center gap-3 mb-3">
+                  <h2 className="text-sm font-semibold text-white">{group.label}</h2>
+                  {group.season && (
+                    <span className="text-xs text-[#555555]">{group.season}</span>
+                  )}
+                  <span className="text-xs text-[#444444]">
+                    {group.fixtures.length} fixture{group.fixtures.length !== 1 ? 's' : ''}
+                  </span>
+                </div>
+
+                <div className="bg-[#111111] rounded-xl border border-[#1a1a1a] overflow-x-auto">
+                  <table className="w-full text-sm min-w-[560px]">
+                    <thead>
+                      <tr className="border-b border-[#1a1a1a]">
+                        <th className="text-left text-xs font-medium text-[#666666] uppercase tracking-wider px-4 py-3 hidden sm:table-cell">Matchday</th>
+                        <th className="text-left text-xs font-medium text-[#666666] uppercase tracking-wider px-4 py-3">Match</th>
+                        <th className="text-left text-xs font-medium text-[#666666] uppercase tracking-wider px-4 py-3">Date</th>
+                        <th className="text-left text-xs font-medium text-[#666666] uppercase tracking-wider px-4 py-3">Status</th>
+                        <th className="text-left text-xs font-medium text-[#666666] uppercase tracking-wider px-4 py-3 hidden md:table-cell">Lineup</th>
+                        <th className="text-left text-xs font-medium text-[#666666] uppercase tracking-wider px-4 py-3 hidden md:table-cell">Events</th>
+                        <th className="text-left text-xs font-medium text-[#666666] uppercase tracking-wider px-4 py-3">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-[#1a1a1a]">
+                      {paginated.map((fixture) => (
+                        <tr key={fixture.id} className="hover:bg-[#1a1a1a]/40 transition-colors">
+                          <td className="px-4 py-3 text-[#888888] hidden sm:table-cell">
+                            {fixture.matchday ?? <span className="text-[#444444]">—</span>}
+                          </td>
+                          <td className="px-4 py-3 text-white font-medium">
+                            {fixture.homeTeam} <span className="text-[#666666] font-normal">vs</span> {fixture.awayTeam}
+                          </td>
+                          <td className="px-4 py-3 text-[#888888] whitespace-nowrap">
+                            {new Date(fixture.date).toLocaleDateString('en-GB', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                            })}
+                            {fixture.kickOffTime && (
+                              <span className="text-[#444444] ml-1 hidden sm:inline">{fixture.kickOffTime}</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            <StatusBadge status={fixture.status} />
+                          </td>
+                          <td className="px-4 py-3 text-[#888888] hidden md:table-cell">
+                            {fixture._count.lineups}
+                          </td>
+                          <td className="px-4 py-3 text-[#888888] hidden md:table-cell">
+                            {fixture._count.events}
+                          </td>
+                          <td className="px-4 py-3">
+                            <FixtureActionsMenu fixtureId={fixture.id} canDelete={fixture.status === 'scheduled'} />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <Pagination page={page} totalPages={totalPages} buildHref={(p) => buildHref(key, p)} />
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

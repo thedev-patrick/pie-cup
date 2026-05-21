@@ -363,6 +363,48 @@ function StatTable({
   );
 }
 
+// ─── Pagination ───────────────────────────────────────────────────────────────
+
+const FIXTURE_PAGE_SIZE = 6;
+const STAT_PAGE_SIZE = 10;
+
+function PageControls({
+  page,
+  totalPages,
+  onPage,
+}: {
+  page: number;
+  totalPages: number;
+  onPage: (p: number) => void;
+}) {
+  if (totalPages <= 1) return null;
+  return (
+    <div className="flex items-center justify-between pt-3">
+      <span className="font-condensed text-xs text-[#3d6b3d] uppercase tracking-wider">
+        {page} / {totalPages}
+      </span>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          disabled={page <= 1}
+          onClick={() => onPage(page - 1)}
+          className="font-condensed font-bold text-xs uppercase tracking-wider px-4 py-1.5 rounded-full border border-[#1a1a1a] text-[#3d6b3d] hover:text-white hover:border-[#2e2e2e] disabled:opacity-30 disabled:pointer-events-none transition-colors"
+        >
+          ← Prev
+        </button>
+        <button
+          type="button"
+          disabled={page >= totalPages}
+          onClick={() => onPage(page + 1)}
+          className="font-condensed font-bold text-xs uppercase tracking-wider px-4 py-1.5 rounded-full border border-[#1a1a1a] text-[#3d6b3d] hover:text-white hover:border-[#2e2e2e] disabled:opacity-30 disabled:pointer-events-none transition-colors"
+        >
+          Next →
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 
 type FixtureTab = 'upcoming' | 'results';
@@ -388,6 +430,9 @@ export default function HomePage() {
   const [fixtureTab, setFixtureTab] = useState<FixtureTab>('upcoming');
   const [statTab, setStatTab] = useState<StatTab>('goals');
   const [loading, setLoading] = useState(true);
+  const [upcomingPage, setUpcomingPage] = useState(1);
+  const [resultsPage, setResultsPage] = useState(1);
+  const [statPage, setStatPage] = useState(1);
 
   const fetchData = useCallback(async (tid: string) => {
     const qs = tid !== 'all' ? `?tournamentId=${tid}` : '';
@@ -408,9 +453,12 @@ export default function HomePage() {
       .catch(() => {});
   }, []);
 
-  // Load fixtures + stats when tournament changes
+  // Load fixtures + stats when tournament changes; reset pages
   useEffect(() => {
     setLoading(true);
+    setUpcomingPage(1);
+    setResultsPage(1);
+    setStatPage(1);
     fetchData(activeTournament).finally(() => setLoading(false));
   }, [activeTournament, fetchData]);
 
@@ -431,7 +479,7 @@ export default function HomePage() {
   const showTournament = activeTournament === 'all';
 
   const activeStatMeta = STAT_TABS.find((t) => t.key === statTab)!;
-  const activeStatRows =
+  const allStatRows =
     statTab === 'goals'
       ? stats?.topScorers ?? []
       : statTab === 'assists'
@@ -439,6 +487,16 @@ export default function HomePage() {
       : statTab === 'yellow'
       ? stats?.yellowCards ?? []
       : stats?.redCards ?? [];
+
+  const upcomingTotalPages = Math.ceil(upcoming.length / FIXTURE_PAGE_SIZE);
+  const resultsTotalPages = Math.ceil(results.length / FIXTURE_PAGE_SIZE);
+  const statTotalPages = Math.ceil(allStatRows.length / STAT_PAGE_SIZE);
+
+  const paginatedUpcoming = upcoming.slice((upcomingPage - 1) * FIXTURE_PAGE_SIZE, upcomingPage * FIXTURE_PAGE_SIZE);
+  const paginatedResults = results.slice((resultsPage - 1) * FIXTURE_PAGE_SIZE, resultsPage * FIXTURE_PAGE_SIZE);
+  const paginatedStats = allStatRows.slice((statPage - 1) * STAT_PAGE_SIZE, statPage * STAT_PAGE_SIZE);
+
+  const activeStatRows = paginatedStats;
 
   return (
     <div className="min-h-screen bg-[#000000] text-white">
@@ -526,7 +584,7 @@ export default function HomePage() {
                   <button
                     key={tab.key}
                     type="button"
-                    onClick={() => setFixtureTab(tab.key)}
+                    onClick={() => { setFixtureTab(tab.key); setUpcomingPage(1); setResultsPage(1); }}
                     className={`font-condensed font-bold text-sm uppercase tracking-wider px-5 py-2 rounded-full border transition-colors ${
                       fixtureTab === tab.key
                         ? 'bg-[#00E676] text-black border-[#00E676]'
@@ -556,15 +614,14 @@ export default function HomePage() {
                     No upcoming fixtures.
                   </p>
                 ) : (
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {upcoming.map((f) => (
-                      <UpcomingCard
-                        key={f.id}
-                        fixture={f}
-                        showTournament={showTournament}
-                      />
-                    ))}
-                  </div>
+                  <>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {paginatedUpcoming.map((f) => (
+                        <UpcomingCard key={f.id} fixture={f} showTournament={showTournament} />
+                      ))}
+                    </div>
+                    <PageControls page={upcomingPage} totalPages={upcomingTotalPages} onPage={setUpcomingPage} />
+                  </>
                 ))}
 
               {/* Results list */}
@@ -574,15 +631,14 @@ export default function HomePage() {
                     No results yet.
                   </p>
                 ) : (
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {results.map((f) => (
-                      <ResultCard
-                        key={f.id}
-                        fixture={f}
-                        showTournament={showTournament}
-                      />
-                    ))}
-                  </div>
+                  <>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {paginatedResults.map((f) => (
+                        <ResultCard key={f.id} fixture={f} showTournament={showTournament} />
+                      ))}
+                    </div>
+                    <PageControls page={resultsPage} totalPages={resultsTotalPages} onPage={setResultsPage} />
+                  </>
                 ))}
             </section>
 
@@ -599,7 +655,7 @@ export default function HomePage() {
                     <button
                       key={tab.key}
                       type="button"
-                      onClick={() => setStatTab(tab.key)}
+                      onClick={() => { setStatTab(tab.key); setStatPage(1); }}
                       className={`py-3 font-condensed font-bold text-xs uppercase tracking-wider transition-colors border-b-2 ${
                         statTab === tab.key
                           ? 'text-white border-[#00E676]'
@@ -619,6 +675,11 @@ export default function HomePage() {
                   icon={activeStatMeta.icon}
                   emptyText={activeStatMeta.emptyText}
                 />
+                {statTotalPages > 1 && (
+                  <div className="px-4 py-3 border-t border-[#1a1a1a]">
+                    <PageControls page={statPage} totalPages={statTotalPages} onPage={setStatPage} />
+                  </div>
+                )}
               </div>
             </section>
           </>
