@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { supabase } from '@/lib/supabase';
 
 const GOAL_TYPES = ['goal', 'penalty'];
 // Marker events: one-per-fixture, no side/player, no score impact (except half_time)
@@ -126,6 +127,26 @@ export async function POST(
     if ([...GOAL_TYPES, 'own_goal', 'half_time'].includes(type)) {
       await recalculateScores(params.id);
     }
+
+    // Sync to Supabase — fire-and-forget so a Supabase failure never blocks the response
+    supabase
+      .from('match_events')
+      .insert({
+        id: event.id,
+        fixture_id: event.fixtureId,
+        minute: event.minute,
+        type: event.type,
+        side: event.side,
+        player_id: event.playerId,
+        player_name: event.playerName,
+        assist_name: event.assistName,
+        player_out_name: event.playerOutName,
+        description: event.description,
+        created_at: event.createdAt,
+      })
+      .then(({ error }) => {
+        if (error) console.error('[Supabase sync] Failed to insert event:', error.message);
+      });
 
     return NextResponse.json(event, { status: 201 });
   } catch {

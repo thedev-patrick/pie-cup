@@ -3,7 +3,11 @@ import fsPromises from 'fs/promises';
 import path from 'path';
 import PDFDocument from 'pdfkit';
 
-const REPORT_DIR = path.join(process.cwd(), 'reports', 'fixtures');
+const REPORT_DIR = path.join(
+  process.env.VERCEL ? '/tmp' : process.cwd(),
+  'reports',
+  'fixtures',
+);
 const REPORT_TTL_MS = 24 * 60 * 60 * 1000;
 const PDFKIT_DATA_SOURCE = path.join(process.cwd(), 'node_modules', 'pdfkit', 'js', 'data');
 const PDFKIT_DATA_TARGET = path.join(process.cwd(), '.next', 'server', 'vendor-chunks', 'data');

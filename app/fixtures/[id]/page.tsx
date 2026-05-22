@@ -209,18 +209,18 @@ export default async function FixturePage({
           )}
 
           {/* Teams + score */}
-          <div className="flex items-center justify-between gap-4 mb-6">
+          <div className="flex items-center justify-between gap-2 sm:gap-4 mb-6">
             {/* Home team */}
             <div className="flex flex-col items-center gap-2 flex-1 min-w-0">
               <TeamBadgeLarge name={fixture.homeTeam} />
-              <span className="font-condensed font-black text-lg sm:text-2xl uppercase tracking-wide text-white text-center leading-tight">
+              <span className="font-condensed font-black text-sm sm:text-2xl uppercase tracking-wide text-white text-center leading-tight">
                 {fixture.homeTeam}
               </span>
             </div>
 
             {/* Score */}
-            <div className="flex flex-col items-center gap-1 flex-shrink-0 px-2">
-              <div className="font-black text-5xl sm:text-6xl tabular-nums tracking-tight text-white leading-none flex items-center gap-3">
+            <div className="flex flex-col items-center gap-1 flex-shrink-0 px-1 sm:px-2">
+              <div className="font-black text-4xl sm:text-6xl tabular-nums tracking-tight text-white leading-none flex items-center gap-2 sm:gap-3">
                 <span>{displayHomeScore}</span>
                 <span className="text-[#1f3d1f]">–</span>
                 <span>{displayAwayScore}</span>
@@ -241,7 +241,7 @@ export default async function FixturePage({
             {/* Away team */}
             <div className="flex flex-col items-center gap-2 flex-1 min-w-0">
               <TeamBadgeLarge name={fixture.awayTeam} />
-              <span className="font-condensed font-black text-lg sm:text-2xl uppercase tracking-wide text-white text-center leading-tight">
+              <span className="font-condensed font-black text-sm sm:text-2xl uppercase tracking-wide text-white text-center leading-tight">
                 {fixture.awayTeam}
               </span>
             </div>

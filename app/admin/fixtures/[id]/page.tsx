@@ -118,7 +118,7 @@ function TabButton({ label, active, onClick }: { label: string; active: boolean;
     <button
       type="button"
       onClick={onClick}
-      className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+      className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors text-center ${
         active
           ? 'bg-[#222222] text-white'
           : 'text-[#888888] hover:text-white hover:bg-[#1a1a1a]'
@@ -200,7 +200,7 @@ function PlayerRow({ player, defaultPosition, playerState, onAdd, onRemove, onUp
           </button>
         </>
       ) : (
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+        <div className="flex gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0">
           <button
             type="button"
             onClick={() => onAdd(player.id, 'starter', defaultPosition)}
@@ -266,7 +266,7 @@ function TeamColumn({ title, players, side, playerState, onAdd, onRemove, onUpda
           {squad.length > 0 && (
             <>
               <p className="text-xs text-slate-500 uppercase tracking-wider px-3 mb-1 mt-3">
-                Squad — hover to add
+                Squad
               </p>
               {squad.map((p) => <PlayerRow key={p.id} player={p} defaultPosition={p.position ?? ''} playerState={playerState} onAdd={onAdd} onRemove={onRemove} onUpdate={onUpdate} />)}
             </>
@@ -1115,8 +1115,8 @@ export default function FixturePage() {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-start justify-between mb-6">
-        <div>
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+        <div className="min-w-0">
           <p className="text-slate-500 text-sm mb-1">
             <button onClick={() => router.push('/admin/fixtures')} className="hover:text-slate-300 transition-colors">
               Admin / Fixtures
@@ -1124,12 +1124,12 @@ export default function FixturePage() {
             {' / '}
             <span className="text-slate-400">Manage</span>
           </p>
-          <h1 className="text-2xl font-bold text-white">
+          <h1 className="text-xl sm:text-2xl font-bold text-white leading-tight">
             {fixture.homeTeam}
             <span className="text-slate-500 font-normal mx-2">vs</span>
             {fixture.awayTeam}
           </h1>
-          <div className="flex items-center gap-3 mt-1.5">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1.5">
             {fixture.matchday && (
               <span className="text-xs text-slate-500">{fixture.matchday}</span>
             )}
@@ -1148,23 +1148,23 @@ export default function FixturePage() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 sm:items-end">
+        <div className="flex flex-row sm:flex-col gap-3 sm:items-end items-center flex-shrink-0">
           {(fixture.scoreAt90Home != null || fixture.scoreAt90Away != null) && (
-            <div className="bg-[#111111] border border-slate-800 rounded-xl px-5 py-3 text-center">
-            <p className="text-2xl font-bold text-white tabular-nums">
-              {fixture.scoreAt90Home ?? 0} – {fixture.scoreAt90Away ?? 0}
-            </p>
-            <p className="text-xs text-slate-500 mt-0.5">
-              HT {fixture.scoreAtHalfTimeHome ?? 0} – {fixture.scoreAtHalfTimeAway ?? 0}
-            </p>
-          </div>
+            <div className="bg-[#111111] border border-slate-800 rounded-xl px-4 sm:px-5 py-3 text-center">
+              <p className="text-xl sm:text-2xl font-bold text-white tabular-nums">
+                {fixture.scoreAt90Home ?? 0} – {fixture.scoreAt90Away ?? 0}
+              </p>
+              <p className="text-xs text-slate-500 mt-0.5">
+                HT {fixture.scoreAtHalfTimeHome ?? 0} – {fixture.scoreAtHalfTimeAway ?? 0}
+              </p>
+            </div>
           )}
           {fixture.status === 'complete' && (
             <a
               href={`/api/fixtures/${fixture.id}/report`}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center justify-center rounded-lg bg-[#00E676] px-4 py-2 text-xs font-semibold text-black hover:bg-[#8cff91] transition-colors"
+              className="inline-flex items-center justify-center rounded-lg bg-[#00E676] px-4 py-2 text-xs font-semibold text-black hover:bg-[#8cff91] transition-colors whitespace-nowrap"
             >
               Download Report
             </a>
@@ -1173,7 +1173,7 @@ export default function FixturePage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 mb-6 bg-[#111111] border border-slate-800 rounded-xl p-1 w-fit">
+      <div className="flex items-center gap-1 mb-6 bg-[#111111] border border-slate-800 rounded-xl p-1 w-full sm:w-fit">
         <TabButton label="Match Info" active={activeTab === 'info'} onClick={() => setActiveTab('info')} />
         <TabButton label={`Lineup (${fixture.lineups.length})`} active={activeTab === 'lineup'} onClick={() => setActiveTab('lineup')} />
         <TabButton label={`Events (${fixture.events.length})`} active={activeTab === 'events'} onClick={() => setActiveTab('events')} />

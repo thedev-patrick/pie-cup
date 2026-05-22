@@ -162,7 +162,33 @@ export default async function FixturesPage({
                   </span>
                 </div>
 
-                <div className="bg-[#111111] rounded-xl border border-[#1a1a1a] overflow-x-auto">
+                {/* Mobile cards */}
+                <div className="sm:hidden bg-[#111111] rounded-xl border border-[#1a1a1a] divide-y divide-[#1a1a1a]">
+                  {paginated.map((fixture) => (
+                    <div key={fixture.id} className="flex items-center justify-between gap-3 px-4 py-3">
+                      <div className="min-w-0">
+                        <p className="text-white font-medium text-sm truncate">
+                          {fixture.homeTeam} <span className="text-[#666666] font-normal">vs</span> {fixture.awayTeam}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          <span className="text-[#888888] text-xs">
+                            {new Date(fixture.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </span>
+                          {fixture.matchday && (
+                            <span className="text-[#555555] text-xs">{fixture.matchday}</span>
+                          )}
+                          <StatusBadge status={fixture.status} />
+                        </div>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <FixtureActionsMenu fixtureId={fixture.id} canDelete={fixture.status === 'scheduled'} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Desktop table */}
+                <div className="hidden sm:block bg-[#111111] rounded-xl border border-[#1a1a1a] overflow-x-auto">
                   <table className="w-full text-sm min-w-[560px]">
                     <thead>
                       <tr className="border-b border-[#1a1a1a]">
