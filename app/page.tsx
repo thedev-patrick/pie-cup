@@ -476,7 +476,7 @@ export default function HomePage() {
   const results = fixtures
     .filter((f) => f.status === 'complete')
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  const showTournament = activeTournament === 'all';
+  const showTournament = true;
 
   const activeStatMeta = STAT_TABS.find((t) => t.key === statTab)!;
   const allStatRows =

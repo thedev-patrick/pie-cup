@@ -377,13 +377,13 @@ export async function generateMatchReportPdf(fixture: FixtureReport) {
     for (const event of sorted) {
       ensureSpace(LINE + 4);
 
-      // ── Half Time separator ────────────────────────────────────────────────
-      if (event.type === 'half_time') {
+      // ── Half Time / Full Time separators ─────────────────────────────────
+      if (event.type === 'half_time' || event.type === 'full_time') {
+        const markerLabel = event.type === 'half_time' ? 'HALF TIME' : 'FULL TIME';
         y += 2;
-        // Shaded band
         doc.rect(M, y, CW, 18).fill('#f0f0f0');
         doc.font('Helvetica-Bold').fontSize(8).fillColor('#555555')
-          .text(`HALF TIME   —   ${event.minute}'`, M, y + 5, { width: CW, align: 'center', characterSpacing: 1 });
+          .text(`${markerLabel}   —   ${event.minute}'`, M, y + 5, { width: CW, align: 'center', characterSpacing: 1 });
         y += 24;
         continue;
       }
