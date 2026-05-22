@@ -62,7 +62,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* ── Main area ── */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 min-w-0 flex flex-col min-h-screen">
 
         {/* ── Mobile top bar ── */}
         <header className="md:hidden flex items-center justify-between bg-[#111111] border-b border-[#1a1a1a] px-4 py-3.5">
@@ -108,7 +108,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </nav>
         )}
 
-        <main className="flex-1 p-4 md:p-8 overflow-auto">
+        <main className="flex-1 p-4 md:p-8 overflow-x-hidden">
           {children}
         </main>
       </div>

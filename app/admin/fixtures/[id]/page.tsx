@@ -118,7 +118,7 @@ function TabButton({ label, active, onClick }: { label: string; active: boolean;
     <button
       type="button"
       onClick={onClick}
-      className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors text-center ${
+      className={`flex-none whitespace-nowrap px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors ${
         active
           ? 'bg-[#222222] text-white'
           : 'text-[#888888] hover:text-white hover:bg-[#1a1a1a]'
@@ -152,42 +152,19 @@ function PlayerRow({ player, defaultPosition, playerState, onAdd, onRemove, onUp
   const state = playerState[player.id];
   const checked = state?.checked ?? false;
 
-  return (
-    <div className={`flex items-center gap-2 py-2 px-3 rounded-lg transition-colors ${checked ? 'bg-slate-800' : 'hover:bg-slate-800/40 group'}`}>
-      {player.jerseyNumber != null && (
-        <span className="bg-slate-700 text-slate-300 text-xs font-bold rounded px-1.5 py-0.5 flex-shrink-0 min-w-[1.75rem] text-center">
-          {player.jerseyNumber}
-        </span>
-      )}
-      <span className={`text-sm flex-1 truncate min-w-0 ${checked ? 'text-white' : 'text-slate-400'}`}>
-        {player.fullName}
-      </span>
-
-      {checked ? (
-        <>
-          <input
-            type="text"
-            value={state?.position ?? ''}
-            onChange={(e) => onUpdate(player.id, 'position', e.target.value)}
-            placeholder="Pos."
-            className="w-16 bg-slate-700 border border-slate-600 rounded px-2 py-1 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-slate-500 transition-colors flex-shrink-0"
-          />
-          <div className="flex rounded overflow-hidden border border-slate-600 flex-shrink-0">
-            <button
-              type="button"
-              onClick={() => onUpdate(player.id, 'role', 'starter')}
-              className={`px-2 py-1 text-xs font-medium transition-colors ${state?.role === 'starter' ? 'bg-[#00E676] text-black' : 'bg-slate-700 text-slate-400 hover:bg-slate-600'}`}
-            >
-              XI
-            </button>
-            <button
-              type="button"
-              onClick={() => onUpdate(player.id, 'role', 'substitute')}
-              className={`px-2 py-1 text-xs font-medium transition-colors ${state?.role === 'substitute' ? 'bg-blue-500 text-white' : 'bg-slate-700 text-slate-400 hover:bg-slate-600'}`}
-            >
-              Sub
-            </button>
-          </div>
+  if (checked) {
+    return (
+      <div className="py-2 px-3 rounded-lg bg-slate-800 space-y-1.5">
+        {/* Row 1: number + name + remove */}
+        <div className="flex items-center gap-2">
+          {player.jerseyNumber != null && (
+            <span className="bg-slate-700 text-slate-300 text-xs font-bold rounded px-1.5 py-0.5 flex-shrink-0 min-w-[1.75rem] text-center">
+              {player.jerseyNumber}
+            </span>
+          )}
+          <span className="text-sm font-medium text-white flex-1 truncate min-w-0">
+            {player.fullName}
+          </span>
           <button
             type="button"
             onClick={() => onRemove(player.id)}
@@ -198,25 +175,63 @@ function PlayerRow({ player, defaultPosition, playerState, onAdd, onRemove, onUp
               <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
             </svg>
           </button>
-        </>
-      ) : (
-        <div className="flex gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0">
-          <button
-            type="button"
-            onClick={() => onAdd(player.id, 'starter', defaultPosition)}
-            className="px-2 py-1 text-xs font-medium rounded bg-[#00E676]/10 text-[#00E676] hover:bg-[#00E676]/20 transition-colors"
-          >
-            + XI
-          </button>
-          <button
-            type="button"
-            onClick={() => onAdd(player.id, 'substitute', defaultPosition)}
-            className="px-2 py-1 text-xs font-medium rounded bg-blue-900/40 text-blue-400 hover:bg-blue-900/60 transition-colors"
-          >
-            + Sub
-          </button>
         </div>
+        {/* Row 2: position input + XI/Sub toggle */}
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={state?.position ?? ''}
+            onChange={(e) => onUpdate(player.id, 'position', e.target.value)}
+            placeholder="Position"
+            className="flex-1 min-w-0 bg-slate-700 border border-slate-600 rounded px-2 py-1 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-slate-500 transition-colors"
+          />
+          <div className="flex rounded overflow-hidden border border-slate-600 flex-shrink-0">
+            <button
+              type="button"
+              onClick={() => onUpdate(player.id, 'role', 'starter')}
+              className={`px-3 py-1 text-xs font-medium transition-colors ${state?.role === 'starter' ? 'bg-[#00E676] text-black' : 'bg-slate-700 text-slate-400 hover:bg-slate-600'}`}
+            >
+              XI
+            </button>
+            <button
+              type="button"
+              onClick={() => onUpdate(player.id, 'role', 'substitute')}
+              className={`px-3 py-1 text-xs font-medium transition-colors ${state?.role === 'substitute' ? 'bg-blue-500 text-white' : 'bg-slate-700 text-slate-400 hover:bg-slate-600'}`}
+            >
+              Sub
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2 py-2 px-3 rounded-lg hover:bg-slate-800/40 group transition-colors">
+      {player.jerseyNumber != null && (
+        <span className="bg-slate-700/60 text-slate-400 text-xs font-bold rounded px-1.5 py-0.5 flex-shrink-0 min-w-[1.75rem] text-center">
+          {player.jerseyNumber}
+        </span>
       )}
+      <span className="text-sm text-slate-400 flex-1 truncate min-w-0">
+        {player.fullName}
+      </span>
+      <div className="flex gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0">
+        <button
+          type="button"
+          onClick={() => onAdd(player.id, 'starter', defaultPosition)}
+          className="px-2 py-1 text-xs font-medium rounded bg-[#00E676]/10 text-[#00E676] hover:bg-[#00E676]/20 transition-colors"
+        >
+          + XI
+        </button>
+        <button
+          type="button"
+          onClick={() => onAdd(player.id, 'substitute', defaultPosition)}
+          className="px-2 py-1 text-xs font-medium rounded bg-blue-900/40 text-blue-400 hover:bg-blue-900/60 transition-colors"
+        >
+          + Sub
+        </button>
+      </div>
     </div>
   );
 }
@@ -540,127 +555,38 @@ function MatchInfoTab({ fixture, onSaved }: { fixture: Fixture; onSaved: () => v
 }
 
 // ---------------------------------------------------------------------------
-// Tab 2 — Lineup
+// Tab 2 — Lineup (per-side view, state lives in parent FixturePage)
 // ---------------------------------------------------------------------------
 
-function LineupTab({ fixture, teams, onSaved }: { fixture: Fixture; teams: Team[]; onSaved: () => void }) {
-  // Build initial state from existing lineups
-  const buildInitialState = useCallback((): Record<string, LineupPlayerState> => {
-    const state: Record<string, LineupPlayerState> = {};
-    for (const entry of fixture.lineups) {
-      state[entry.playerId] = {
-        checked: true,
-        role: (entry.role === 'substitute' ? 'substitute' : 'starter') as 'starter' | 'substitute',
-        position: entry.position ?? '',
-      };
-    }
-    return state;
-  }, [fixture.lineups]);
+interface LineupSideTabProps {
+  side: 'home' | 'away';
+  teamName: string;
+  players: Player[];
+  playerState: Record<string, LineupPlayerState>;
+  onAdd: (playerId: string, role: 'starter' | 'substitute', defaultPosition: string) => void;
+  onRemove: (playerId: string) => void;
+  onUpdate: (playerId: string, field: 'role' | 'position', value: string) => void;
+  onSave: () => void;
+  saving: boolean;
+  error: string | null;
+  saved: boolean;
+}
 
-  const [playerState, setPlayerState] = useState<Record<string, LineupPlayerState>>(buildInitialState);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
-
-  // Re-init when fixture changes
-  useEffect(() => {
-    setPlayerState(buildInitialState());
-  }, [buildInitialState]);
-
-  const homeTeams = teams.filter((t) => t.name === fixture.homeTeam);
-  const awayTeams = teams.filter((t) => t.name === fixture.awayTeam);
-
-  // Fallback: if no exact match, use all teams split evenly
-  const homePlayers = homeTeams.length > 0
-    ? homeTeams.flatMap((t) => t.players)
-    : [];
-  const awayPlayers = awayTeams.length > 0
-    ? awayTeams.flatMap((t) => t.players)
-    : [];
-
-  function addPlayer(playerId: string, role: 'starter' | 'substitute', defaultPosition: string) {
-    setPlayerState((prev) => ({
-      ...prev,
-      [playerId]: {
-        checked: true,
-        role,
-        position: prev[playerId]?.position ?? defaultPosition,
-      },
-    }));
-  }
-
-  function removePlayer(playerId: string) {
-    setPlayerState((prev) => ({
-      ...prev,
-      [playerId]: { ...prev[playerId], checked: false },
-    }));
-  }
-
-  function updatePlayerField(playerId: string, field: 'role' | 'position', value: string) {
-    setPlayerState((prev) => ({
-      ...prev,
-      [playerId]: { ...prev[playerId], [field]: value },
-    }));
-  }
-
-  async function handleSave() {
-    setSaving(true);
-    setError(null);
-    setSaved(false);
-
-    // Client-side limit check before hitting the API
-    const homeStarters = homePlayers.filter((p) => playerState[p.id]?.checked && playerState[p.id]?.role === 'starter').length;
-    const homeSubs = homePlayers.filter((p) => playerState[p.id]?.checked && playerState[p.id]?.role === 'substitute').length;
-    const awayStarters = awayPlayers.filter((p) => playerState[p.id]?.checked && playerState[p.id]?.role === 'starter').length;
-    const awaySubs = awayPlayers.filter((p) => playerState[p.id]?.checked && playerState[p.id]?.role === 'substitute').length;
-
-    if (homeStarters > 11) { setError(`Home team has ${homeStarters} starters — maximum is 11.`); setSaving(false); return; }
-    if (homeSubs > 14) { setError(`Home team has ${homeSubs} substitutes — maximum is 14.`); setSaving(false); return; }
-    if (awayStarters > 11) { setError(`Away team has ${awayStarters} starters — maximum is 11.`); setSaving(false); return; }
-    if (awaySubs > 14) { setError(`Away team has ${awaySubs} substitutes — maximum is 14.`); setSaving(false); return; }
-
-    try {
-      const payload = Object.entries(playerState)
-        .filter(([, s]) => s.checked)
-        .map(([playerId, s]) => {
-          // Determine side from which team list the player belongs to
-          const isHome = homePlayers.some((p) => p.id === playerId);
-          return {
-            playerId,
-            side: isHome ? 'home' : 'away',
-            role: s.role,
-            position: s.position,
-          };
-        });
-
-      const res = await fetch(`/api/fixtures/${fixture.id}/lineup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ lineups: payload }),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data?.error ?? `Server error ${res.status}`);
-      }
-      setSaved(true);
-      onSaved();
-      setTimeout(() => setSaved(false), 2500);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
-    } finally {
-      setSaving(false);
-    }
-  }
-
+function LineupSideTab({
+  side, teamName, players, playerState, onAdd, onRemove, onUpdate, onSave, saving, error, saved,
+}: LineupSideTabProps) {
   return (
     <div className="space-y-4">
-      <div className="bg-[#111111] border border-slate-800 rounded-xl p-6">
-        <div className="flex flex-col sm:flex-row gap-6 sm:gap-8">
-          <TeamColumn title={fixture.homeTeam} players={homePlayers} side="home" playerState={playerState} onAdd={addPlayer} onRemove={removePlayer} onUpdate={updatePlayerField} />
-          <div className="hidden sm:block w-px bg-slate-800 self-stretch" />
-          <div className="block sm:hidden h-px bg-slate-800 w-full" />
-          <TeamColumn title={fixture.awayTeam} players={awayPlayers} side="away" playerState={playerState} onAdd={addPlayer} onRemove={removePlayer} onUpdate={updatePlayerField} />
-        </div>
+      <div className="bg-[#111111] border border-slate-800 rounded-xl p-3 sm:p-6">
+        <TeamColumn
+          title={teamName}
+          players={players}
+          side={side}
+          playerState={playerState}
+          onAdd={onAdd}
+          onRemove={onRemove}
+          onUpdate={onUpdate}
+        />
       </div>
 
       {error && (
@@ -673,7 +599,7 @@ function LineupTab({ fixture, teams, onSaved }: { fixture: Fixture; teams: Team[
       <div className="flex justify-end">
         <button
           type="button"
-          onClick={handleSave}
+          onClick={onSave}
           disabled={saving}
           className="bg-green-600 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg px-6 py-2 transition-colors"
         >
@@ -1047,7 +973,7 @@ function EventsTab({ fixture, onRefresh }: { fixture: Fixture; onRefresh: () => 
 // Main Page
 // ---------------------------------------------------------------------------
 
-type Tab = 'info' | 'lineup' | 'events';
+type Tab = 'info' | 'lineup_home' | 'lineup_away' | 'events';
 
 export default function FixturePage() {
   const { id } = useParams<{ id: string }>();
@@ -1058,6 +984,12 @@ export default function FixturePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('info');
+
+  // Lineup state — shared between home and away tabs
+  const [lineupPlayerState, setLineupPlayerState] = useState<Record<string, LineupPlayerState>>({});
+  const [lineupSaving, setLineupSaving] = useState(false);
+  const [lineupError, setLineupError] = useState<string | null>(null);
+  const [lineupSaved, setLineupSaved] = useState(false);
 
   const fetchFixture = useCallback(async () => {
     try {
@@ -1090,6 +1022,90 @@ export default function FixturePage() {
     init();
   }, [fetchFixture, fetchTeams]);
 
+  // Re-init lineup state whenever fixture reloads
+  useEffect(() => {
+    if (!fixture) return;
+    const state: Record<string, LineupPlayerState> = {};
+    for (const entry of fixture.lineups) {
+      state[entry.playerId] = {
+        checked: true,
+        role: entry.role === 'substitute' ? 'substitute' : 'starter',
+        position: entry.position ?? '',
+      };
+    }
+    setLineupPlayerState(state);
+  }, [fixture]);
+
+  // Derived player lists for lineup tabs
+  const homePlayers = teams.filter((t) => fixture && t.name === fixture.homeTeam).flatMap((t) => t.players);
+  const awayPlayers = teams.filter((t) => fixture && t.name === fixture.awayTeam).flatMap((t) => t.players);
+
+  function addLineupPlayer(playerId: string, role: 'starter' | 'substitute', defaultPosition: string) {
+    setLineupPlayerState((prev) => ({
+      ...prev,
+      [playerId]: { checked: true, role, position: prev[playerId]?.position ?? defaultPosition },
+    }));
+  }
+
+  function removeLineupPlayer(playerId: string) {
+    setLineupPlayerState((prev) => ({
+      ...prev,
+      [playerId]: { ...prev[playerId], checked: false },
+    }));
+  }
+
+  function updateLineupPlayerField(playerId: string, field: 'role' | 'position', value: string) {
+    setLineupPlayerState((prev) => ({
+      ...prev,
+      [playerId]: { ...prev[playerId], [field]: value },
+    }));
+  }
+
+  async function handleLineupSave() {
+    if (!fixture) return;
+    setLineupSaving(true);
+    setLineupError(null);
+    setLineupSaved(false);
+
+    const homeStarters = homePlayers.filter((p) => lineupPlayerState[p.id]?.checked && lineupPlayerState[p.id]?.role === 'starter').length;
+    const homeSubs = homePlayers.filter((p) => lineupPlayerState[p.id]?.checked && lineupPlayerState[p.id]?.role === 'substitute').length;
+    const awayStarters = awayPlayers.filter((p) => lineupPlayerState[p.id]?.checked && lineupPlayerState[p.id]?.role === 'starter').length;
+    const awaySubs = awayPlayers.filter((p) => lineupPlayerState[p.id]?.checked && lineupPlayerState[p.id]?.role === 'substitute').length;
+
+    if (homeStarters > 11) { setLineupError(`Home team has ${homeStarters} starters — maximum is 11.`); setLineupSaving(false); return; }
+    if (homeSubs > 14) { setLineupError(`Home team has ${homeSubs} substitutes — maximum is 14.`); setLineupSaving(false); return; }
+    if (awayStarters > 11) { setLineupError(`Away team has ${awayStarters} starters — maximum is 11.`); setLineupSaving(false); return; }
+    if (awaySubs > 14) { setLineupError(`Away team has ${awaySubs} substitutes — maximum is 14.`); setLineupSaving(false); return; }
+
+    try {
+      const payload = Object.entries(lineupPlayerState)
+        .filter(([, s]) => s.checked)
+        .map(([playerId, s]) => ({
+          playerId,
+          side: homePlayers.some((p) => p.id === playerId) ? 'home' : 'away',
+          role: s.role,
+          position: s.position,
+        }));
+
+      const res = await fetch(`/api/fixtures/${fixture.id}/lineup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lineups: payload }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error ?? `Server error ${res.status}`);
+      }
+      setLineupSaved(true);
+      fetchFixture();
+      setTimeout(() => setLineupSaved(false), 2500);
+    } catch (err: unknown) {
+      setLineupError(err instanceof Error ? err.message : 'Something went wrong');
+    } finally {
+      setLineupSaving(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -1113,7 +1129,7 @@ export default function FixturePage() {
   }
 
   return (
-    <div>
+    <div className="max-w-full">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
         <div className="min-w-0">
@@ -1173,9 +1189,10 @@ export default function FixturePage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 mb-6 bg-[#111111] border border-slate-800 rounded-xl p-1 w-full sm:w-fit">
+      <div className="flex items-center gap-1 mb-6 bg-[#111111] border border-slate-800 rounded-xl p-1 overflow-x-auto scrollbar-hide">
         <TabButton label="Match Info" active={activeTab === 'info'} onClick={() => setActiveTab('info')} />
-        <TabButton label={`Lineup (${fixture.lineups.length})`} active={activeTab === 'lineup'} onClick={() => setActiveTab('lineup')} />
+        <TabButton label="Home Lineup" active={activeTab === 'lineup_home'} onClick={() => setActiveTab('lineup_home')} />
+        <TabButton label="Away Lineup" active={activeTab === 'lineup_away'} onClick={() => setActiveTab('lineup_away')} />
         <TabButton label={`Events (${fixture.events.length})`} active={activeTab === 'events'} onClick={() => setActiveTab('events')} />
       </div>
 
@@ -1183,8 +1200,35 @@ export default function FixturePage() {
       {activeTab === 'info' && (
         <MatchInfoTab fixture={fixture} onSaved={fetchFixture} />
       )}
-      {activeTab === 'lineup' && (
-        <LineupTab fixture={fixture} teams={teams} onSaved={fetchFixture} />
+      {activeTab === 'lineup_home' && (
+        <LineupSideTab
+          side="home"
+          teamName={fixture.homeTeam}
+          players={homePlayers}
+          playerState={lineupPlayerState}
+          onAdd={addLineupPlayer}
+          onRemove={removeLineupPlayer}
+          onUpdate={updateLineupPlayerField}
+          onSave={handleLineupSave}
+          saving={lineupSaving}
+          error={lineupError}
+          saved={lineupSaved}
+        />
+      )}
+      {activeTab === 'lineup_away' && (
+        <LineupSideTab
+          side="away"
+          teamName={fixture.awayTeam}
+          players={awayPlayers}
+          playerState={lineupPlayerState}
+          onAdd={addLineupPlayer}
+          onRemove={removeLineupPlayer}
+          onUpdate={updateLineupPlayerField}
+          onSave={handleLineupSave}
+          saving={lineupSaving}
+          error={lineupError}
+          saved={lineupSaved}
+        />
       )}
       {activeTab === 'events' && (
         <EventsTab fixture={fixture} onRefresh={fetchFixture} />
