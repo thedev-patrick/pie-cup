@@ -257,8 +257,8 @@ function TeamColumn({ title, players, side, playerState, onAdd, onRemove, onUpda
           )}
           {subs.length > 0 && (
             <>
-              <p className={`text-xs uppercase tracking-wider px-3 mb-1 mt-3 ${subs.length > 5 ? 'text-red-400 font-semibold' : 'text-slate-500'}`}>
-                Substitutes ({subs.length}/5){subs.length > 5 ? ' — exceeds limit!' : ''}
+              <p className={`text-xs uppercase tracking-wider px-3 mb-1 mt-3 ${subs.length > 14 ? 'text-red-400 font-semibold' : 'text-slate-500'}`}>
+                Substitutes ({subs.length}/14){subs.length > 14 ? ' — exceeds limit!' : ''}
               </p>
               {subs.map((p) => <PlayerRow key={p.id} player={p} defaultPosition={p.position ?? ''} playerState={playerState} onAdd={onAdd} onRemove={onRemove} onUpdate={onUpdate} />)}
             </>
@@ -615,9 +615,9 @@ function LineupTab({ fixture, teams, onSaved }: { fixture: Fixture; teams: Team[
     const awaySubs = awayPlayers.filter((p) => playerState[p.id]?.checked && playerState[p.id]?.role === 'substitute').length;
 
     if (homeStarters > 11) { setError(`Home team has ${homeStarters} starters — maximum is 11.`); setSaving(false); return; }
-    if (homeSubs > 5) { setError(`Home team has ${homeSubs} substitutes — maximum is 5.`); setSaving(false); return; }
+    if (homeSubs > 14) { setError(`Home team has ${homeSubs} substitutes — maximum is 14.`); setSaving(false); return; }
     if (awayStarters > 11) { setError(`Away team has ${awayStarters} starters — maximum is 11.`); setSaving(false); return; }
-    if (awaySubs > 5) { setError(`Away team has ${awaySubs} substitutes — maximum is 5.`); setSaving(false); return; }
+    if (awaySubs > 14) { setError(`Away team has ${awaySubs} substitutes — maximum is 14.`); setSaving(false); return; }
 
     try {
       const payload = Object.entries(playerState)

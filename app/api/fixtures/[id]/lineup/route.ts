@@ -46,9 +46,9 @@ export async function POST(
           { status: 400 },
         );
       }
-      if (counts.subs > 5) {
+      if (counts.subs > 14) {
         return NextResponse.json(
-          { error: `The ${side} team cannot have more than 5 substitutes (currently ${counts.subs})` },
+          { error: `The ${side} team cannot have more than 14 substitutes (currently ${counts.subs})` },
           { status: 400 },
         );
       }
