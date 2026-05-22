@@ -10,7 +10,10 @@ const REPORT_DIR = path.join(
 );
 const REPORT_TTL_MS = 24 * 60 * 60 * 1000;
 const PDFKIT_DATA_SOURCE = path.join(process.cwd(), 'node_modules', 'pdfkit', 'js', 'data');
-const PDFKIT_DATA_TARGET = path.join(process.cwd(), '.next', 'server', 'vendor-chunks', 'data');
+const PDFKIT_DATA_TARGET = path.join(
+  process.env.VERCEL ? '/tmp' : process.cwd(),
+  'pdfkit-data',
+);
 const PDFKIT_STANDARD_FONT_FILES = [
   'Courier.afm', 'Courier-Bold.afm', 'Courier-Oblique.afm', 'Courier-BoldOblique.afm',
   'Helvetica.afm', 'Helvetica-Bold.afm', 'Helvetica-Oblique.afm', 'Helvetica-BoldOblique.afm',
