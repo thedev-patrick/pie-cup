@@ -57,6 +57,7 @@ model Fixture {
   scoreAfterExtraTimeHome Int?
   scoreAfterExtraTimeAway Int?
   manOfTheMatch           String?
+  summary                 String?
   tournamentStage         String?
   tournament              Tournament?  @relation(fields: [tournamentId], references: [id])
   tournamentId            String?

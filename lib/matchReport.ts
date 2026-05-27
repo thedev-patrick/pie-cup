@@ -72,6 +72,7 @@ interface FixtureReport {
   scoreAfterExtraTimeHome: number | null;
   scoreAfterExtraTimeAway: number | null;
   manOfTheMatch: string | null;
+  summary: string | null;
   tournamentId: string | null;
   stats?: Array<{
     name: string;
@@ -143,14 +144,17 @@ const EVENT_TYPE_COLOR: Record<string, string> = {
 };
 
 function buildEventDescription(event: MatchEvent): string {
-  if (event.description) return event.description;
   const actor = event.playerName || 'Unknown';
+  let text: string;
   if (event.type === 'substitution') {
     const off = event.playerOutName ? ` for ${event.playerOutName}` : '';
-    return `${actor}${off}`;
+    text = `${actor}${off}`;
+  } else {
+    const assist = event.assistName ? ` (assist: ${event.assistName})` : '';
+    text = `${actor}${assist}`;
   }
-  const assist = event.assistName ? ` (assist: ${event.assistName})` : '';
-  return `${actor}${assist}`;
+  if (event.description) text += `  —  ${event.description}`;
+  return text;
 }
 
 // ─── PDF Generator ──────────────────────────────────────────────────────────
@@ -274,6 +278,16 @@ export async function generateMatchReportPdf(fixture: FixtureReport) {
       .font('Helvetica-Bold').fillColor('#333333')
       .text(fixture.manOfTheMatch, { align: 'left' });
     y += 16;
+  }
+
+  // ── MATCH SUMMARY ────────────────────────────────────────────────────────
+  if (fixture.summary) {
+    sectionTitle('MATCH SUMMARY');
+    const summaryLines = doc.heightOfString(fixture.summary, { width: CW, align: 'justify' });
+    ensureSpace(summaryLines + 8);
+    doc.font('Helvetica').fontSize(9).fillColor('#333333')
+      .text(fixture.summary, M, y, { width: CW, align: 'justify', lineGap: 2 });
+    y += summaryLines + 10;
   }
 
   // ── LINEUPS ───────────────────────────────────────────────────────────────

@@ -66,6 +66,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         scoreAfterExtraTimeHome: body.scoreAfterExtraTimeHome !== undefined ? (body.scoreAfterExtraTimeHome === '' ? null : Number(body.scoreAfterExtraTimeHome)) : existing.scoreAfterExtraTimeHome,
         scoreAfterExtraTimeAway: body.scoreAfterExtraTimeAway !== undefined ? (body.scoreAfterExtraTimeAway === '' ? null : Number(body.scoreAfterExtraTimeAway)) : existing.scoreAfterExtraTimeAway,
         manOfTheMatch: body.manOfTheMatch !== undefined ? (body.manOfTheMatch || null) : existing.manOfTheMatch,
+        summary: body.summary !== undefined ? (body.summary || null) : existing.summary,
         tournamentId: body.tournamentId !== undefined ? (body.tournamentId || null) : existing.tournamentId,
       },
       include: {
