@@ -65,6 +65,7 @@ interface Fixture {
   scoreAfterExtraTimeHome: number | null;
   scoreAfterExtraTimeAway: number | null;
   manOfTheMatch: string | null;
+  summary: string | null;
   lineups: LineupEntry[];
   events: MatchEvent[];
 }
@@ -316,6 +317,7 @@ function MatchInfoTab({ fixture, onSaved }: { fixture: Fixture; onSaved: () => v
     scoreAfterExtraTimeHome: fixture.scoreAfterExtraTimeHome ?? 0,
     scoreAfterExtraTimeAway: fixture.scoreAfterExtraTimeAway ?? 0,
     manOfTheMatch: fixture.manOfTheMatch ?? '',
+    summary: fixture.summary ?? '',
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -415,11 +417,11 @@ function MatchInfoTab({ fixture, onSaved }: { fixture: Fixture; onSaved: () => v
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <div>
             <label className={labelCls()}>Date</label>
-            <input type="date" value={form.date} onChange={(e) => set('date', e.target.value)} className={inputCls('[color-scheme:dark]')} />
+            <input type="date" title="Date" value={form.date} onChange={(e) => set('date', e.target.value)} className={inputCls('[color-scheme:dark]')} />
           </div>
           <div>
             <label className={labelCls()}>Kick-off Time</label>
-            <input type="time" value={form.kickOffTime} onChange={(e) => set('kickOffTime', e.target.value)} className={inputCls('[color-scheme:dark]')} />
+            <input type="time" title="Kick-off Time" value={form.kickOffTime} onChange={(e) => set('kickOffTime', e.target.value)} className={inputCls('[color-scheme:dark]')} />
           </div>
         </div>
         <div className="mb-4">
@@ -438,7 +440,7 @@ function MatchInfoTab({ fixture, onSaved }: { fixture: Fixture; onSaved: () => v
         </div>
         <div>
           <label className={labelCls()}>Status</label>
-          <select value={form.status} onChange={(e) => set('status', e.target.value)} className={inputCls()}>
+          <select title="Status" value={form.status} onChange={(e) => set('status', e.target.value)} className={inputCls()}>
             <option value="scheduled">Scheduled</option>
             <option value="ongoing">Ongoing</option>
             <option value="complete">Complete</option>
@@ -455,11 +457,11 @@ function MatchInfoTab({ fixture, onSaved }: { fixture: Fixture; onSaved: () => v
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
           <div>
             <label className={labelCls()}>Home</label>
-            <input type="number" min={0} value={form.scoreAtHalfTimeHome} onChange={(e) => set('scoreAtHalfTimeHome', Number(e.target.value))} className={inputCls()} />
+            <input type="number" title="Half time home score" min={0} value={form.scoreAtHalfTimeHome} onChange={(e) => set('scoreAtHalfTimeHome', Number(e.target.value))} className={inputCls()} />
           </div>
           <div>
             <label className={labelCls()}>Away</label>
-            <input type="number" min={0} value={form.scoreAtHalfTimeAway} onChange={(e) => set('scoreAtHalfTimeAway', Number(e.target.value))} className={inputCls()} />
+            <input type="number" title="Half time away score" min={0} value={form.scoreAtHalfTimeAway} onChange={(e) => set('scoreAtHalfTimeAway', Number(e.target.value))} className={inputCls()} />
           </div>
         </div>
 
@@ -468,11 +470,11 @@ function MatchInfoTab({ fixture, onSaved }: { fixture: Fixture; onSaved: () => v
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
           <div>
             <label className={labelCls()}>Home</label>
-            <input type="number" min={0} value={form.scoreAt90Home} onChange={(e) => set('scoreAt90Home', Number(e.target.value))} className={inputCls()} />
+            <input type="number" title="90 min home score" min={0} value={form.scoreAt90Home} onChange={(e) => set('scoreAt90Home', Number(e.target.value))} className={inputCls()} />
           </div>
           <div>
             <label className={labelCls()}>Away</label>
-            <input type="number" min={0} value={form.scoreAt90Away} onChange={(e) => set('scoreAt90Away', Number(e.target.value))} className={inputCls()} />
+            <input type="number" title="90 min away score" min={0} value={form.scoreAt90Away} onChange={(e) => set('scoreAt90Away', Number(e.target.value))} className={inputCls()} />
           </div>
         </div>
 
@@ -493,11 +495,11 @@ function MatchInfoTab({ fixture, onSaved }: { fixture: Fixture; onSaved: () => v
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={labelCls()}>Home</label>
-                <input type="number" min={0} value={form.scoreAfterExtraTimeHome} onChange={(e) => set('scoreAfterExtraTimeHome', Number(e.target.value))} className={inputCls()} />
+                <input type="number" title="Extra time home score" min={0} value={form.scoreAfterExtraTimeHome} onChange={(e) => set('scoreAfterExtraTimeHome', Number(e.target.value))} className={inputCls()} />
               </div>
               <div>
                 <label className={labelCls()}>Away</label>
-                <input type="number" min={0} value={form.scoreAfterExtraTimeAway} onChange={(e) => set('scoreAfterExtraTimeAway', Number(e.target.value))} className={inputCls()} />
+                <input type="number" title="Extra time away score" min={0} value={form.scoreAfterExtraTimeAway} onChange={(e) => set('scoreAfterExtraTimeAway', Number(e.target.value))} className={inputCls()} />
               </div>
             </div>
           </>
@@ -524,6 +526,20 @@ function MatchInfoTab({ fixture, onSaved }: { fixture: Fixture; onSaved: () => v
         ) : (
           <input type="text" value={form.manOfTheMatch} onChange={(e) => set('manOfTheMatch', e.target.value)} className={inputCls()} placeholder="Player name (set lineup first for dropdown)" />
         )}
+      </div>
+
+      {/* Match Summary */}
+      <div className="bg-[#111111] border border-slate-800 rounded-xl p-6">
+        <label className={labelCls()}>Match Summary</label>
+        <p className="text-xs text-slate-600 mb-2">A general overview of the game. Included in the match report.</p>
+        <textarea
+          title="Match Summary"
+          value={form.summary}
+          onChange={(e) => set('summary', e.target.value)}
+          placeholder="e.g. A tightly contested match that saw the home side dominate possession in the first half before the visitors equalised through a well-worked move…"
+          rows={5}
+          className="w-full bg-[#1a1a1a] border border-[#222222] rounded-lg px-3 py-2 text-white placeholder-[#333333] text-sm focus:outline-none focus:border-[#00E676] focus:ring-1 focus:ring-[#00E676] transition-colors resize-y"
+        />
       </div>
 
       {/* Error / success */}
@@ -1119,6 +1135,7 @@ export default function FixturePage() {
       <div className="bg-red-900/20 border border-red-800 rounded-xl p-8 text-center">
         <p className="text-red-400 text-sm mb-4">{error ?? 'Fixture not found.'}</p>
         <button
+          type="button"
           onClick={() => router.push('/admin/fixtures')}
           className="text-sm text-slate-400 hover:text-white transition-colors"
         >
@@ -1134,7 +1151,7 @@ export default function FixturePage() {
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
         <div className="min-w-0">
           <p className="text-slate-500 text-sm mb-1">
-            <button onClick={() => router.push('/admin/fixtures')} className="hover:text-slate-300 transition-colors">
+            <button type="button" onClick={() => router.push('/admin/fixtures')} className="hover:text-slate-300 transition-colors">
               Admin / Fixtures
             </button>
             {' / '}
